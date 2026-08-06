@@ -1,0 +1,163 @@
+import { useEffect, useState } from "react";
+import { api, getApiErrorMessage } from "../api/axios";
+
+const initialForm = {
+  lesson: "",
+  word: "",
+  meaning: "",
+  pronunciation: "",
+  example: "",
+};
+
+export default function AddVocabulary() {
+  const [form, setForm] = useState(initialForm);
+  const [lessons, setLessons] = useState([]);
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchLessons() {
+      try {
+        const response = await api.get("/lessons/");
+        setLessons(response.data);
+      } catch (requestError) {
+        setMessage(getApiErrorMessage(requestError));
+      }
+    }
+
+    fetchLessons();
+  }, []);
+
+  function validate(currentForm) {
+    const nextErrors = {};
+
+    if (!currentForm.lesson) {
+      nextErrors.lesson = "Lesson is required.";
+    }
+    if (!currentForm.word.trim()) {
+      nextErrors.word = "English word is required.";
+    } else if (currentForm.word.length > 100) {
+      nextErrors.word = "English word cannot exceed 100 characters.";
+    }
+    if (!currentForm.meaning.trim()) {
+      nextErrors.meaning = "Bengali meaning is required.";
+    } else if (currentForm.meaning.length > 255) {
+      nextErrors.meaning = "Bengali meaning cannot exceed 255 characters.";
+    }
+    if (currentForm.pronunciation.length > 150) {
+      nextErrors.pronunciation = "Pronunciation cannot exceed 150 characters.";
+    }
+
+    return nextErrors;
+  }
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setForm((current) => ({ ...current, [name]: value }));
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    const nextErrors = validate(form);
+    setErrors(nextErrors);
+    setMessage("");
+
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await api.post("/vocabulary/", {
+        lesson: Number(form.lesson),
+        word: form.word.trim(),
+        meaning: form.meaning.trim(),
+        pronunciation: form.pronunciation.trim(),
+        example: form.example.trim(),
+      });
+      setMessage("Vocabulary created successfully.");
+      setForm(initialForm);
+    } catch (requestError) {
+      setMessage(getApiErrorMessage(requestError));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <section className="form-page">
+      <div className="page-heading">
+        <div>
+          <span className="eyebrow">Admin</span>
+          <h2>Add Vocabulary</h2>
+        </div>
+      </div>
+
+      <form className="card form-card" onSubmit={handleSubmit} noValidate>
+        <label>
+          Lesson
+          <select name="lesson" value={form.lesson} onChange={handleChange}>
+            <option value="">Select a lesson</option>
+            {lessons.map((lesson) => (
+              <option key={lesson.id} value={lesson.id}>
+                {lesson.title}
+              </option>
+            ))}
+          </select>
+          {errors.lesson ? (
+            <span className="field-error">{errors.lesson}</span>
+          ) : null}
+        </label>
+
+        <label>
+          English Word
+          <input
+            name="word"
+            value={form.word}
+            onChange={handleChange}
+          />
+          {errors.word ? (
+            <span className="field-error">{errors.word}</span>
+          ) : null}
+        </label>
+
+        <label>
+          Bengali Meaning
+          <input
+            name="meaning"
+            value={form.meaning}
+            onChange={handleChange}
+          />
+          {errors.meaning ? (
+            <span className="field-error">{errors.meaning}</span>
+          ) : null}
+        </label>
+
+        <label>
+          Example Sentence (optional)
+          <textarea
+            name="example"
+            rows="4"
+            value={form.example}
+            onChange={handleChange}
+          />
+        </label>
+
+        {message ? (
+          <p
+            className={`status-message ${message.includes("successfully") ? "success" : "error"}`}
+          >
+            {message}
+          </p>
+        ) : null}
+
+        <div className="button-row">
+          <button className="btn btn-primary" type="submit" disabled={loading}>
+            {loading ? "Saving..." : "Save Vocabulary"}
+          </button>
+        </div>
+      </form>
+    </section>
+  );
+}
