@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
 
 export default function EditLesson() {
@@ -80,6 +80,9 @@ export default function EditLesson() {
           <span className="eyebrow">Admin</span>
           <h2>Edit Lesson</h2>
         </div>
+        <Link className="btn btn-outline" to="/admin/lessons">
+          Back to Lessons
+        </Link>
       </div>
 
       <form className="card form-card" onSubmit={handleSubmit} noValidate>

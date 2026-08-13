@@ -80,7 +80,11 @@ export default function VocabularyList({ adminMode = false }) {
           <Link className="btn btn-primary" to="/admin/vocabulary/new">
             Add Vocabulary
           </Link>
-        ) : null}
+        ) : (
+          <Link className="btn btn-primary" to="/student/learn-cards">
+            Learn Using Cards
+          </Link>
+        )}
       </div>
 
       <div className="search-panel card">

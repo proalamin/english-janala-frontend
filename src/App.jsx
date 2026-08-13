@@ -7,6 +7,7 @@ import AddLesson from "./pages/AddLesson";
 import EditLesson from "./pages/EditLesson";
 import LessonVocabulary from "./pages/LessonVocabulary";
 import VocabularyList from "./pages/VocabularyList";
+import LearnCards from "./pages/LearnCards";
 import AddVocabulary from "./pages/AddVocabulary";
 import EditVocabulary from "./pages/EditVocabulary";
 import WordDetails from "./pages/WordDetails";
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/student/lessons" element={<LessonList />} />
           <Route path="/student/lessons/:id" element={<LessonVocabulary />} />
           <Route path="/student/vocabulary" element={<VocabularyList />} />
+          <Route path="/student/learn-cards" element={<LearnCards />} />
           <Route path="/student/vocabulary/:id" element={<WordDetails backTo="/student/vocabulary" />} />
 
           <Route path="/admin" element={<AdminDashboard />} />

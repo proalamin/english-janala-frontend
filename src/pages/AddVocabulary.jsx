@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
 
 const initialForm = {
@@ -92,6 +93,9 @@ export default function AddVocabulary() {
           <span className="eyebrow">Admin</span>
           <h2>Add Vocabulary</h2>
         </div>
+        <Link className="btn btn-outline" to="/admin/vocabulary">
+          Back to Vocabulary
+        </Link>
       </div>
 
       <form className="card form-card" onSubmit={handleSubmit} noValidate>

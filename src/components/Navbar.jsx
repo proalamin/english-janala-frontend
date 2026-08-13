@@ -45,7 +45,14 @@ export default function Navbar() {
             className={navLinkClass}
             onClick={() => setMenuOpen(false)}
           >
-            Vocabulary
+            Learn Vocabulary
+          </NavLink>
+          <NavLink
+            to="/student/learn-cards"
+            className={navLinkClass}
+            onClick={() => setMenuOpen(false)}
+          >
+            Practice Vocabulary
           </NavLink>
         </nav>
       </div>

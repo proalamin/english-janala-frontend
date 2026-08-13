@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
 
 const initialForm = {
@@ -61,6 +62,9 @@ export default function AddLesson() {
           <span className="eyebrow">Admin</span>
           <h2>Add Lesson</h2>
         </div>
+        <Link className="btn btn-outline" to="/admin/lessons">
+          Back to Lessons
+        </Link>
       </div>
 
       <form className="card form-card" onSubmit={handleSubmit} noValidate>

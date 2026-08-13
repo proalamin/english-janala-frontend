@@ -194,6 +194,24 @@ textarea {
   text-transform: uppercase;
 }
 
+
+.clickable-card {
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.clickable-card:hover,
+.clickable-card:focus-visible {
+  border-color: rgba(31, 122, 63, 0.45);
+  box-shadow: 0 18px 44px rgba(15, 74, 42, 0.14);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.clickable-card .button-row {
+  cursor: default;
+}
+
 .button-row {
   display: flex;
   flex-wrap: wrap;
@@ -655,5 +673,182 @@ textarea {
 
   .footer-bottom {
     width: min(100% - 20px, 1120px);
+  }
+}
+
+.learn-layout {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.learn-panel {
+  min-height: 320px;
+}
+
+.learn-panel-heading {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 18px;
+}
+
+.learn-lesson-list,
+.learn-card-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.learn-lesson-button,
+.study-card-preview {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.learn-lesson-button {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+}
+
+.learn-lesson-button span,
+.study-card-preview span {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.learn-lesson-button:hover,
+.learn-lesson-button.active,
+.study-card-preview:hover,
+.study-card-preview:focus-visible {
+  border-color: rgba(31, 122, 63, 0.45);
+  box-shadow: 0 14px 34px rgba(15, 74, 42, 0.12);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.learn-lesson-button.active {
+  background: rgba(31, 122, 63, 0.08);
+}
+
+.learn-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.study-card-preview {
+  display: grid;
+  gap: 10px;
+  min-height: 135px;
+  padding: 18px;
+}
+
+.study-card-preview strong {
+  font-size: 1.2rem;
+}
+
+.study-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.study-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 35, 24, 0.58);
+}
+
+.study-modal-content {
+  position: relative;
+  z-index: 1;
+  width: min(440px, 92vw);
+  perspective: 1200px;
+}
+
+.modal-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  z-index: 3;
+  width: 42px;
+  min-height: 42px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.flip-card {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 420ms ease;
+}
+
+.flip-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.flip-card-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding: 34px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  backface-visibility: hidden;
+  text-align: center;
+}
+
+.flip-card-face strong {
+  display: block;
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  line-height: 1.05;
+  color: var(--primary-dark);
+}
+
+.flip-card-face span:not(.eyebrow) {
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.flip-card-face small {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+  text-align: left;
+}
+
+.flip-card-back strong {
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+}
+
+@media (max-width: 780px) {
+  .learn-layout {
+    grid-template-columns: 1fr;
   }
 }
