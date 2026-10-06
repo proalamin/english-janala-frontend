@@ -13,7 +13,7 @@ export default function Home() {
           <p>{t("heroCopy")}</p>
 
           <div className="button-row">
-            <Link to="/student/lessons" className="btn btn-primary">
+            <Link to="/student/segments" className="btn btn-primary">
               {t("startLearning")}
             </Link>
             <Link to="/student/vocabulary" className="btn btn-secondary">
@@ -44,10 +44,10 @@ export default function Home() {
 
       <div className="home-grid">
         <article className="card feature-card">
-          <span className="pill">{t("lessons")}</span>
+          <span className="pill">{t("segments")}</span>
           <h3>{t("organizedVocabulary")}</h3>
           <p>{t("lessonsFeatureCopy")}</p>
-          <Link className="text-link" to="/student/lessons">
+          <Link className="text-link" to="/student/segments">
             {t("viewLessons")}
           </Link>
         </article>

@@ -22,7 +22,7 @@ export default function Footer() {
 
         <div className="footer-column">
           <h3>{t("learnVocabulary")}</h3>
-          <Link to="/student/lessons">{t("browseLessons")}</Link>
+          <Link to="/student/segments">{t("browseLessons")}</Link>
           <Link to="/student/vocabulary">{t("searchVocabulary")}</Link>
           <Link to="/student/learn-cards">{t("practiceVocabulary")}</Link>
         </div>
@@ -30,7 +30,7 @@ export default function Footer() {
         <div className="footer-column">
           <h3>{t("admin")}</h3>
           <Link to="/admin">{t("adminPanel")}</Link>
-          <Link to="/admin/lessons">{t("manageLessons")}</Link>
+          <Link to="/admin/segments">{t("manageLessons")}</Link>
           <Link to="/admin/vocabulary">{t("manageVocabulary")}</Link>
           <span className="footer-url">/admin</span>
         </div>

@@ -16,14 +16,14 @@ export default function AdminDashboard() {
 
       <div className="grid two-column-grid">
         <article className="card">
-          <h3>{t("lessons")}</h3>
-          <p className="muted-text">{t("lessonAdminCopy")}</p>
+          <h3>{t("segments")}</h3>
+          <p className="muted-text">{t("segmentAdminCopy")}</p>
           <div className="button-row">
-            <Link className="btn btn-primary" to="/admin/lessons">
-              {t("manageLessons")}
+            <Link className="btn btn-primary" to="/admin/segments">
+              {t("manageSegments")}
             </Link>
-            <Link className="btn btn-outline" to="/admin/lessons/new">
-              {t("addLesson")}
+            <Link className="btn btn-outline" to="/admin/segments/new">
+              {t("addSegment")}
             </Link>
           </div>
         </article>

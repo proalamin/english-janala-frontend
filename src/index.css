@@ -461,6 +461,59 @@ textarea {
   margin-top: 10px;
 }
 
+.pill-full {
+  background: rgba(196, 42, 42, 0.12);
+  color: #b3261e;
+}
+
+.bundle-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0;
+}
+
+.bundle-progress-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(31, 122, 63, 0.12);
+  overflow: hidden;
+}
+
+.bundle-progress-fill {
+  height: 100%;
+  background: var(--primary-dark, #1f7a3f);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.bundle-progress-fill.complete {
+  background: #1f7a3f;
+}
+
+.bundle-progress-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.segment-complete-banner {
+  margin-bottom: 16px;
+}
+
+.known-toggle {
+  margin-top: 14px;
+}
+
+.known-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  color: #1f7a3f;
+  font-weight: 700;
+}
+
 .meaning-text {
   font-size: 1.05rem;
   font-weight: 700;

@@ -3,28 +3,22 @@ import { Link, useParams } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
 import { useLanguage } from "../language";
 
-export default function EditLesson() {
+export default function EditSegment() {
   const { t } = useLanguage();
   const { id } = useParams();
-  const [segments, setSegments] = useState([]);
-  const [form, setForm] = useState({ segment: "", title: "", description: "" });
+  const [form, setForm] = useState({ name: "", description: "" });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchSegment() {
       try {
-        const [segmentsResponse, lessonResponse] = await Promise.all([
-          api.get("/segments/"),
-          api.get(`/lessons/${id}/`),
-        ]);
-        setSegments(segmentsResponse.data);
+        const response = await api.get(`/segments/${id}/`);
         setForm({
-          segment: String(lessonResponse.data.segment || ""),
-          title: lessonResponse.data.title || "",
-          description: lessonResponse.data.description || "",
+          name: response.data.name || "",
+          description: response.data.description || "",
         });
       } catch (requestError) {
         setMessage(getApiErrorMessage(requestError));
@@ -33,19 +27,16 @@ export default function EditLesson() {
       }
     }
 
-    fetchData();
+    fetchSegment();
   }, [id]);
 
   function validate(currentForm) {
     const nextErrors = {};
 
-    if (!currentForm.segment) {
-      nextErrors.segment = "Segment is required.";
-    }
-    if (!currentForm.title.trim()) {
-      nextErrors.title = "Title is required.";
-    } else if (currentForm.title.length > 150) {
-      nextErrors.title = "Title cannot exceed 150 characters.";
+    if (!currentForm.name.trim()) {
+      nextErrors.name = "Segment name is required.";
+    } else if (currentForm.name.length > 100) {
+      nextErrors.name = "Segment name cannot exceed 100 characters.";
     }
 
     return nextErrors;
@@ -68,12 +59,11 @@ export default function EditLesson() {
 
     try {
       setSaving(true);
-      await api.patch(`/lessons/${id}/`, {
-        segment: Number(form.segment),
-        title: form.title.trim(),
+      await api.patch(`/segments/${id}/`, {
+        name: form.name.trim(),
         description: form.description.trim(),
       });
-      setMessage("Lesson updated successfully.");
+      setMessage("Segment updated successfully.");
     } catch (requestError) {
       setMessage(getApiErrorMessage(requestError));
     } finally {
@@ -82,7 +72,7 @@ export default function EditLesson() {
   }
 
   if (loading) {
-    return <p className="status-message">{t("loadingLessons")}</p>;
+    return <p className="status-message">{t("loadingSegments")}</p>;
   }
 
   return (
@@ -90,12 +80,9 @@ export default function EditLesson() {
       <div className="page-heading">
         <div>
           <span className="eyebrow">{t("admin")}</span>
-          <h2>{t("editLesson")}</h2>
+          <h2>{t("editSegment")}</h2>
         </div>
-        <Link
-          className="btn btn-outline"
-          to={form.segment ? `/admin/segments/${form.segment}` : "/admin/segments"}
-        >
+        <Link className="btn btn-outline" to="/admin/segments">
           {t("backToSegments")}
         </Link>
       </div>
@@ -103,31 +90,10 @@ export default function EditLesson() {
       <form className="card form-card" onSubmit={handleSubmit} noValidate>
         <label>
           <span className="label-text">
-            {t("segment")} <span className="required-mark">*</span>
+            {t("segmentName")} <span className="required-mark">*</span>
           </span>
-          <select name="segment" value={form.segment} onChange={handleChange}>
-            <option value="">{t("selectASegment")}</option>
-            {segments.map((segment) => (
-              <option key={segment.id} value={segment.id}>
-                {segment.name}
-              </option>
-            ))}
-          </select>
-          {errors.segment ? <span className="field-error">{errors.segment}</span> : null}
-        </label>
-
-        <label>
-          <span className="label-text">
-            {t("title")} <span className="required-mark">*</span>
-          </span>
-          <input
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-          />
-          {errors.title ? (
-            <span className="field-error">{errors.title}</span>
-          ) : null}
+          <input name="name" value={form.name} onChange={handleChange} />
+          {errors.name ? <span className="field-error">{errors.name}</span> : null}
         </label>
 
         <label>
@@ -152,7 +118,7 @@ export default function EditLesson() {
 
         <div className="button-row">
           <button className="btn btn-primary" type="submit" disabled={saving}>
-            {saving ? t("updating") : t("updateLesson")}
+            {saving ? t("updating") : t("updateSegment")}
           </button>
         </div>
       </form>

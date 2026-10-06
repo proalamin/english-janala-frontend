@@ -1,10 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "../language";
 
-export default function LessonCard({ lesson, adminMode = false, onDelete }) {
+export default function LessonCard({ lesson, adminMode = false, onDelete, progress }) {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const basePath = adminMode ? "/admin/lessons" : "/student/lessons";
+  const basePath = adminMode ? "/admin/bundles" : "/student/bundles";
   const detailPath = `${basePath}/${lesson.id}`;
 
   function openLesson() {
@@ -35,16 +35,36 @@ export default function LessonCard({ lesson, adminMode = false, onDelete }) {
     >
       <div className="card-header">
         <h3>{lesson.title}</h3>
+        {typeof lesson.vocabulary_count === "number" ? (
+          <span className={`pill ${lesson.is_full ? "pill-full" : ""}`}>
+            {lesson.vocabulary_count}/{lesson.capacity ?? 20} {t("words")}
+          </span>
+        ) : null}
       </div>
       <p className="muted-text">
         {lesson.description || t("noDescription")}
       </p>
+      {progress ? (
+        <div className="bundle-progress">
+          <div className="bundle-progress-track">
+            <div
+              className={`bundle-progress-fill ${progress.complete ? "complete" : ""}`}
+              style={{ width: `${progress.percent}%` }}
+            />
+          </div>
+          <span className="bundle-progress-label">
+            {progress.complete
+              ? t("bundleComplete")
+              : `${progress.known}/${progress.total} ${t("wordsLearned")}`}
+          </span>
+        </div>
+      ) : null}
       <div className="button-row" onClick={handleActionClick}>
         <Link className="btn btn-secondary" to={detailPath}>
           {t("viewVocabulary")}
         </Link>
         {adminMode ? (
-          <Link className="btn btn-outline" to={`/admin/lessons/${lesson.id}/edit`}>
+          <Link className="btn btn-outline" to={`/admin/bundles/${lesson.id}/edit`}>
             {t("edit")}
           </Link>
         ) : null}

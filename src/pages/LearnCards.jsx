@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
 import { useLanguage } from "../language";
+import { getBundleProgress, isWordKnown, toggleWordKnown } from "../progress";
 
 export default function LearnCards() {
   const { t } = useLanguage();
@@ -13,6 +14,9 @@ export default function LearnCards() {
   const [loadingLessons, setLoadingLessons] = useState(true);
   const [loadingVocabulary, setLoadingVocabulary] = useState(false);
   const [error, setError] = useState("");
+  const [knownVersion, setKnownVersion] = useState(0);
+
+  const progress = getBundleProgress(vocabulary.map((item) => item.id));
 
   useEffect(() => {
     async function fetchLessons() {
@@ -53,6 +57,11 @@ export default function LearnCards() {
   function closeWord() {
     setSelectedWord(null);
     setFlipped(false);
+  }
+
+  function handleToggleKnown(wordId) {
+    toggleWordKnown(wordId);
+    setKnownVersion((value) => value + 1);
   }
 
   return (
@@ -110,6 +119,22 @@ export default function LearnCards() {
             <p className="muted-text">{t("noLessonCards")}</p>
           ) : null}
 
+          {selectedLesson && !loadingVocabulary && vocabulary.length > 0 ? (
+            <div className="bundle-progress">
+              <div className="bundle-progress-track">
+                <div
+                  className={`bundle-progress-fill ${progress.complete ? "complete" : ""}`}
+                  style={{ width: `${progress.percent}%` }}
+                />
+              </div>
+              <span className="bundle-progress-label">
+                {progress.complete
+                  ? t("bundleComplete")
+                  : `${progress.known}/${progress.total} ${t("wordsLearned")}`}
+              </span>
+            </div>
+          ) : null}
+
           <div className="learn-card-grid">
             {vocabulary.map((item) => (
               <button
@@ -118,7 +143,10 @@ export default function LearnCards() {
                 key={item.id}
                 onClick={() => openWord(item)}
               >
-                <strong>{item.word}</strong>
+                <strong>
+                  {item.word}
+                  {isWordKnown(item.id) ? <span className="known-badge">✓</span> : null}
+                </strong>
                 <span>{t("clickPractice")}</span>
               </button>
             ))}
@@ -154,6 +182,13 @@ export default function LearnCards() {
                 ) : null}
                 <small>{t("clickFlipBack")}</small>
               </span>
+            </button>
+            <button
+              className={`btn ${isWordKnown(selectedWord.id) ? "btn-outline" : "btn-primary"} known-toggle`}
+              type="button"
+              onClick={() => handleToggleKnown(selectedWord.id)}
+            >
+              {isWordKnown(selectedWord.id) ? t("markAsUnknown") : t("markAsKnown")}
             </button>
           </div>
         </div>

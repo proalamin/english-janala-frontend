@@ -36,11 +36,11 @@ export default function Navbar() {
             {t("home")}
           </NavLink>
           <NavLink
-            to="/student/lessons"
+            to="/student/segments"
             className={navLinkClass}
             onClick={() => setMenuOpen(false)}
           >
-            {t("lessons")}
+            {t("segments")}
           </NavLink>
           <NavLink
             to="/student/vocabulary"

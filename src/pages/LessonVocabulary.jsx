@@ -66,8 +66,17 @@ export default function LessonVocabulary({ adminMode = false }) {
             <p className="muted-text">{lesson.description}</p>
           ) : null}
         </div>
-        <Link className="btn btn-outline" to={adminMode ? "/admin/lessons" : "/student/lessons"}>
-          {t("backToLessons")}
+        <Link
+          className="btn btn-outline"
+          to={
+            lesson?.segment
+              ? `${adminMode ? "/admin/segments" : "/student/segments"}/${lesson.segment}`
+              : adminMode
+                ? "/admin/segments"
+                : "/student/segments"
+          }
+        >
+          {t("backToSegments")}
         </Link>
       </div>
 
