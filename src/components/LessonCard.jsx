@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "../language";
 
-export default function LessonCard({ lesson, adminMode = false, onDelete, progress }) {
+export default function LessonCard({ lesson, adminMode = false, onDelete, progress, showSegmentName = false }) {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const basePath = adminMode ? "/admin/bundles" : "/student/bundles";
@@ -34,13 +34,21 @@ export default function LessonCard({ lesson, adminMode = false, onDelete, progre
       }}
     >
       <div className="card-header">
-        <h3>{lesson.title}</h3>
+        <h3>
+          {typeof lesson.serial === "number" ? (
+            <span className="bundle-serial">#{lesson.serial}</span>
+          ) : null}
+          {lesson.title}
+        </h3>
         {typeof lesson.vocabulary_count === "number" ? (
           <span className={`pill ${lesson.is_full ? "pill-full" : ""}`}>
             {lesson.vocabulary_count}/{lesson.capacity ?? 20} {t("words")}
           </span>
         ) : null}
       </div>
+      {showSegmentName && lesson.segment_name ? (
+        <span className="pill segment-pill">{lesson.segment_name}</span>
+      ) : null}
       <p className="muted-text">
         {lesson.description || t("noDescription")}
       </p>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
 import { useLanguage } from "../language";
 
@@ -15,7 +15,7 @@ const PARTS_OF_SPEECH = [
 ];
 
 const initialForm = {
-  lesson: "",
+  segment: "",
   word: "",
   meaning: "",
   pronunciation: "",
@@ -28,30 +28,34 @@ const initialForm = {
 
 export default function AddVocabulary() {
   const { t } = useLanguage();
-  const [form, setForm] = useState(initialForm);
-  const [lessons, setLessons] = useState([]);
+  const [searchParams] = useSearchParams();
+  const [segments, setSegments] = useState([]);
+  const [form, setForm] = useState({
+    ...initialForm,
+    segment: searchParams.get("segment") || "",
+  });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    async function fetchLessons() {
+    async function fetchSegments() {
       try {
-        const response = await api.get("/lessons/");
-        setLessons(response.data);
+        const response = await api.get("/segments/");
+        setSegments(response.data);
       } catch (requestError) {
         setMessage(getApiErrorMessage(requestError));
       }
     }
 
-    fetchLessons();
+    fetchSegments();
   }, []);
 
   function validate(currentForm) {
     const nextErrors = {};
 
-    if (!currentForm.lesson) {
-      nextErrors.lesson = "Lesson is required.";
+    if (!currentForm.segment) {
+      nextErrors.segment = "Segment is required.";
     }
     if (!currentForm.word.trim()) {
       nextErrors.word = "English word is required.";
@@ -87,8 +91,7 @@ export default function AddVocabulary() {
 
     try {
       setLoading(true);
-      await api.post("/vocabulary/", {
-        lesson: Number(form.lesson),
+      const response = await api.post(`/segments/${form.segment}/vocabulary/`, {
         word: form.word.trim(),
         meaning: form.meaning.trim(),
         pronunciation: form.pronunciation.trim(),
@@ -98,8 +101,10 @@ export default function AddVocabulary() {
         synonyms: form.synonyms.trim(),
         antonyms: form.antonyms.trim(),
       });
-      setMessage("Vocabulary created successfully.");
-      setForm(initialForm);
+      setMessage(
+        `Vocabulary created successfully. Added to "${response.data.lesson_title}" (Bundle ${response.data.bundle_serial}).`,
+      );
+      setForm({ ...initialForm, segment: form.segment });
     } catch (requestError) {
       setMessage(getApiErrorMessage(requestError));
     } finally {
@@ -113,6 +118,7 @@ export default function AddVocabulary() {
         <div>
           <span className="eyebrow">{t("admin")}</span>
           <h2>{t("addVocabulary")}</h2>
+          <p className="muted-text">{t("addVocabularyCopy")}</p>
         </div>
         <Link className="btn btn-outline" to="/admin/vocabulary">
           {t("backToVocabulary")}
@@ -122,18 +128,18 @@ export default function AddVocabulary() {
       <form className="card form-card" onSubmit={handleSubmit} noValidate>
         <label>
           <span className="label-text">
-            {t("lesson")} <span className="required-mark">*</span>
+            {t("segment")} <span className="required-mark">*</span>
           </span>
-          <select name="lesson" value={form.lesson} onChange={handleChange}>
-            <option value="">{t("selectALesson")}</option>
-            {lessons.map((lesson) => (
-              <option key={lesson.id} value={lesson.id}>
-                {lesson.title}
+          <select name="segment" value={form.segment} onChange={handleChange}>
+            <option value="">{t("selectASegment")}</option>
+            {segments.map((segment) => (
+              <option key={segment.id} value={segment.id}>
+                {segment.name}
               </option>
             ))}
           </select>
-          {errors.lesson ? (
-            <span className="field-error">{errors.lesson}</span>
+          {errors.segment ? (
+            <span className="field-error">{errors.segment}</span>
           ) : null}
         </label>
 

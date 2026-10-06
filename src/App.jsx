@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import AdminLayout from "./components/AdminLayout";
 import Home from "./pages/Home";
 import SegmentList from "./pages/SegmentList";
 import AddSegment from "./pages/AddSegment";
@@ -16,6 +17,7 @@ import AddVocabulary from "./pages/AddVocabulary";
 import EditVocabulary from "./pages/EditVocabulary";
 import WordDetails from "./pages/WordDetails";
 import AdminDashboard from "./pages/AdminDashboard";
+import AllBundles from "./pages/AllBundles";
 import { useLanguage } from "./language";
 
 
@@ -62,13 +64,24 @@ function LegacyRedirect({ to }) {
   return <Navigate to={id ? `${to}/${id}` : to} replace />;
 }
 
-export default function App() {
+function PublicLayout() {
   return (
     <div className="app-shell">
-      <RouteLoader />
       <Navbar />
       <main className="page-container">
-        <Routes>
+        <Outlet />
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <>
+      <RouteLoader />
+      <Routes>
+        <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/student/segments" element={<SegmentList />} />
           <Route path="/student/segments/:id" element={<SegmentBundles />} />
@@ -77,27 +90,30 @@ export default function App() {
           <Route path="/student/learn-cards" element={<LearnCards />} />
           <Route path="/student/vocabulary/:id" element={<WordDetails backTo="/student/vocabulary" />} />
 
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/segments" element={<SegmentList adminMode />} />
-          <Route path="/admin/segments/new" element={<AddSegment />} />
-          <Route path="/admin/segments/:id/edit" element={<EditSegment />} />
-          <Route path="/admin/segments/:id" element={<SegmentBundles adminMode />} />
-          <Route path="/admin/bundles/new" element={<AddLesson />} />
-          <Route path="/admin/bundles/:id/edit" element={<EditLesson />} />
-          <Route path="/admin/bundles/:id" element={<LessonVocabulary adminMode />} />
-          <Route path="/admin/vocabulary" element={<VocabularyList adminMode />} />
-          <Route path="/admin/vocabulary/new" element={<AddVocabulary />} />
-          <Route path="/admin/vocabulary/:id/edit" element={<EditVocabulary />} />
-          <Route path="/admin/vocabulary/:id" element={<WordDetails backTo="/admin/vocabulary" />} />
-
           <Route path="/lessons" element={<Navigate to="/student/segments" replace />} />
           <Route path="/lessons/:id" element={<LegacyRedirect to="/student/bundles" />} />
           <Route path="/vocabulary" element={<Navigate to="/student/vocabulary" replace />} />
           <Route path="/vocabulary/:id" element={<LegacyRedirect to="/student/vocabulary" />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+        </Route>
+
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="segments" element={<SegmentList adminMode />} />
+          <Route path="segments/new" element={<AddSegment />} />
+          <Route path="segments/:id/edit" element={<EditSegment />} />
+          <Route path="segments/:id" element={<SegmentBundles adminMode />} />
+          <Route path="bundles" element={<AllBundles />} />
+          <Route path="bundles/new" element={<AddLesson />} />
+          <Route path="bundles/:id/edit" element={<EditLesson />} />
+          <Route path="bundles/:id" element={<LessonVocabulary adminMode />} />
+          <Route path="vocabulary" element={<VocabularyList adminMode />} />
+          <Route path="vocabulary/new" element={<AddVocabulary />} />
+          <Route path="vocabulary/:id/edit" element={<EditVocabulary />} />
+          <Route path="vocabulary/:id" element={<WordDetails backTo="/admin/vocabulary" />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }

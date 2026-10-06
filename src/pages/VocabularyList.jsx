@@ -4,32 +4,87 @@ import VocabularyCard from "../components/VocabularyCard";
 import { api, getApiErrorMessage } from "../api/axios";
 import { useLanguage } from "../language";
 
+const PARTS_OF_SPEECH = [
+  "noun",
+  "verb",
+  "adjective",
+  "adverb",
+  "pronoun",
+  "preposition",
+  "conjunction",
+  "interjection",
+];
+
 export default function VocabularyList({ adminMode = false }) {
   const { t } = useLanguage();
   const [vocabulary, setVocabulary] = useState([]);
   const [query, setQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
   const [difficulty, setDifficulty] = useState("");
+  const [partOfSpeech, setPartOfSpeech] = useState("");
+  const [segmentFilter, setSegmentFilter] = useState("");
+  const [segments, setSegments] = useState([]);
+  const [page, setPage] = useState(1);
+  const [count, setCount] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
+  const pageSize = 12;
+  const totalPages = Math.max(1, Math.ceil(count / pageSize));
+
+  useEffect(() => {
+    if (adminMode) {
+      api
+        .get("/segments/")
+        .then((response) => setSegments(response.data))
+        .catch(() => {});
+    }
+  }, [adminMode]);
+
   useEffect(() => {
     loadVocabulary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function loadVocabulary(searchQuery = "", difficultyFilter = difficulty) {
+  async function loadVocabulary(options = {}) {
+    const nextPage = options.page ?? page;
+    const searchQuery = options.query ?? query;
+    const difficultyFilter = options.difficulty ?? difficulty;
+    const partOfSpeechFilter = options.partOfSpeech ?? partOfSpeech;
+    const segmentFilterValue = options.segment ?? segmentFilter;
+
     try {
       setLoading(true);
       setError("");
       setMessage("");
       const nextQuery = searchQuery.trim();
-      const params = difficultyFilter ? `&difficulty=${difficultyFilter}` : "";
-      const endpoint = nextQuery
-        ? `/vocabulary/search/?q=${encodeURIComponent(nextQuery)}${params}`
-        : `/vocabulary/?${params.replace(/^&/, "")}`;
-      const response = await api.get(endpoint);
-      setVocabulary(nextQuery ? response.data.results || [] : response.data);
+
+      const params = new URLSearchParams();
+      if (difficultyFilter) params.set("difficulty", difficultyFilter);
+      if (partOfSpeechFilter) params.set("part_of_speech", partOfSpeechFilter);
+      if (segmentFilterValue) params.set("segment", segmentFilterValue);
+
+      if (nextQuery) {
+        params.set("q", nextQuery);
+        const response = await api.get(`/vocabulary/search/?${params.toString()}`);
+        setVocabulary(response.data.results || []);
+        setCount(response.data.count || 0);
+        setHasNext(false);
+        setHasPrevious(false);
+        setPage(1);
+      } else {
+        params.set("page", nextPage);
+        params.set("page_size", pageSize);
+        const response = await api.get(`/vocabulary/?${params.toString()}`);
+        setVocabulary(response.data.results || []);
+        setCount(response.data.count || 0);
+        setHasNext(Boolean(response.data.next));
+        setHasPrevious(Boolean(response.data.previous));
+        setPage(nextPage);
+      }
       setActiveQuery(nextQuery);
     } catch (requestError) {
       setError(getApiErrorMessage(requestError));
@@ -40,24 +95,45 @@ export default function VocabularyList({ adminMode = false }) {
 
   function handleSubmit(event) {
     event.preventDefault();
-    loadVocabulary(query, difficulty);
+    loadVocabulary({ page: 1 });
   }
 
   function handleReset() {
     setQuery("");
     setDifficulty("");
-    loadVocabulary("", "");
+    setPartOfSpeech("");
+    setSegmentFilter("");
+    loadVocabulary({ page: 1, query: "", difficulty: "", partOfSpeech: "", segment: "" });
   }
 
   function handleDifficultyChange(event) {
     const value = event.target.value;
     setDifficulty(value);
-    loadVocabulary(query, value);
+    loadVocabulary({ page: 1, difficulty: value });
+  }
+
+  function handlePartOfSpeechChange(event) {
+    const value = event.target.value;
+    setPartOfSpeech(value);
+    loadVocabulary({ page: 1, partOfSpeech: value });
+  }
+
+  function handleSegmentChange(event) {
+    const value = event.target.value;
+    setSegmentFilter(value);
+    loadVocabulary({ page: 1, segment: value });
   }
 
   function searchSuggestion(value) {
     setQuery(value);
-    loadVocabulary(value, difficulty);
+    loadVocabulary({ page: 1, query: value });
+  }
+
+  function goToPage(nextPage) {
+    if (nextPage < 1 || nextPage > totalPages) {
+      return;
+    }
+    loadVocabulary({ page: nextPage });
   }
 
   async function deleteVocabulary(item) {
@@ -71,14 +147,14 @@ export default function VocabularyList({ adminMode = false }) {
       setMessage("");
       setError("");
       await api.delete(`/vocabulary/${item.id}/`);
-      setVocabulary((current) =>
-        current.filter((vocabularyItem) => vocabularyItem.id !== item.id),
-      );
       setMessage("Vocabulary deleted successfully.");
+      loadVocabulary();
     } catch (requestError) {
       setError(getApiErrorMessage(requestError));
     }
   }
+
+  const isSearching = Boolean(activeQuery);
 
   return (
     <section>
@@ -106,7 +182,7 @@ export default function VocabularyList({ adminMode = false }) {
           </div>
           {!loading && !error ? (
             <span className="result-count">
-              {activeQuery ? `${vocabulary.length} ${t("resultCount")}` : `${vocabulary.length} ${t("wordCount")}`}
+              {count} {isSearching ? t("resultCount") : t("wordCount")}
             </span>
           ) : null}
         </div>
@@ -129,15 +205,43 @@ export default function VocabularyList({ adminMode = false }) {
           </button>
         </form>
 
-        <label className="search-field difficulty-filter">
-          <span>{t("difficulty")}</span>
-          <select value={difficulty} onChange={handleDifficultyChange}>
-            <option value="">{t("allDifficulties")}</option>
-            <option value="easy">{t("easy")}</option>
-            <option value="medium">{t("medium")}</option>
-            <option value="hard">{t("hard")}</option>
-          </select>
-        </label>
+        <div className="filter-row">
+          <label className="search-field difficulty-filter">
+            <span>{t("difficulty")}</span>
+            <select value={difficulty} onChange={handleDifficultyChange}>
+              <option value="">{t("allDifficulties")}</option>
+              <option value="easy">{t("easy")}</option>
+              <option value="medium">{t("medium")}</option>
+              <option value="hard">{t("hard")}</option>
+            </select>
+          </label>
+
+          <label className="search-field difficulty-filter">
+            <span>{t("partOfSpeech")}</span>
+            <select value={partOfSpeech} onChange={handlePartOfSpeechChange}>
+              <option value="">{t("allPartsOfSpeech")}</option>
+              {PARTS_OF_SPEECH.map((pos) => (
+                <option key={pos} value={pos}>
+                  {t(pos)}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {adminMode ? (
+            <label className="search-field difficulty-filter">
+              <span>{t("segment")}</span>
+              <select value={segmentFilter} onChange={handleSegmentChange}>
+                <option value="">{t("allSegments")}</option>
+                {segments.map((segment) => (
+                  <option key={segment.id} value={segment.id}>
+                    {segment.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+        </div>
 
         <div className="search-suggestions" aria-label={t("searchSuggestions")}>
           <span>{t("try")}</span>
@@ -155,9 +259,9 @@ export default function VocabularyList({ adminMode = false }) {
 
       {!loading && !error && vocabulary.length === 0 ? (
         <div className="empty-state card">
-          <h3>{activeQuery ? t("noMatchingWords") : t("noVocabularyFound")}</h3>
+          <h3>{isSearching ? t("noMatchingWords") : t("noVocabularyFound")}</h3>
           <p>
-            {activeQuery
+            {isSearching
               ? `${t("noResultMatched")} "${activeQuery}".`
               : adminMode
                 ? t("addVocabularyPrompt")
@@ -181,6 +285,30 @@ export default function VocabularyList({ adminMode = false }) {
           />
         ))}
       </div>
+
+      {!isSearching && !loading && !error && count > pageSize ? (
+        <div className="pagination">
+          <button
+            className="btn btn-outline"
+            type="button"
+            onClick={() => goToPage(page - 1)}
+            disabled={!hasPrevious}
+          >
+            {t("previousPage")}
+          </button>
+          <span className="pagination-info">
+            {t("page")} {page} {t("of")} {totalPages}
+          </span>
+          <button
+            className="btn btn-outline"
+            type="button"
+            onClick={() => goToPage(page + 1)}
+            disabled={!hasNext}
+          >
+            {t("nextPage")}
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 }

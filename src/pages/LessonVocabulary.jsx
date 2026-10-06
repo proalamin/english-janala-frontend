@@ -66,18 +66,25 @@ export default function LessonVocabulary({ adminMode = false }) {
             <p className="muted-text">{lesson.description}</p>
           ) : null}
         </div>
-        <Link
-          className="btn btn-outline"
-          to={
-            lesson?.segment
-              ? `${adminMode ? "/admin/segments" : "/student/segments"}/${lesson.segment}`
-              : adminMode
-                ? "/admin/segments"
-                : "/student/segments"
-          }
-        >
-          {t("backToSegments")}
-        </Link>
+        <div className="button-row">
+          {adminMode && lesson?.segment ? (
+            <Link className="btn btn-primary" to={`/admin/vocabulary/new?segment=${lesson.segment}`}>
+              {t("addVocabulary")}
+            </Link>
+          ) : null}
+          <Link
+            className="btn btn-outline"
+            to={
+              lesson?.segment
+                ? `${adminMode ? "/admin/segments" : "/student/segments"}/${lesson.segment}`
+                : adminMode
+                  ? "/admin/segments"
+                  : "/student/segments"
+            }
+          >
+            {t("backToSegments")}
+          </Link>
+        </div>
       </div>
 
       {error ? <p className="status-message error">{error}</p> : null}

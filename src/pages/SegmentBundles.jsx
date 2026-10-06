@@ -86,7 +86,12 @@ export default function SegmentBundles({ adminMode = false }) {
         </div>
         <div className="button-row">
           {adminMode ? (
-            <Link className="btn btn-primary" to={`/admin/bundles/new?segment=${id}`}>
+            <Link className="btn btn-primary" to={`/admin/vocabulary/new?segment=${id}`}>
+              {t("addVocabulary")}
+            </Link>
+          ) : null}
+          {adminMode ? (
+            <Link className="btn btn-outline" to={`/admin/bundles/new?segment=${id}`}>
               {t("addBundle")}
             </Link>
           ) : null}
