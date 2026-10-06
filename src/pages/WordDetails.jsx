@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
+import { useLanguage } from "../language";
 
 export default function WordDetails({ backTo = "/student/vocabulary" }) {
+  const { t } = useLanguage();
   const { id } = useParams();
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ export default function WordDetails({ backTo = "/student/vocabulary" }) {
   }, [id]);
 
   if (loading) {
-    return <p className="status-message">Loading word details...</p>;
+    return <p className="status-message">{t("loadingWordDetails")}</p>;
   }
 
   if (error) {
@@ -35,32 +37,50 @@ export default function WordDetails({ backTo = "/student/vocabulary" }) {
     <section className="detail-page">
       <div className="page-heading">
         <div>
-          <span className="eyebrow">Word Details</span>
+          <span className="eyebrow">{t("wordDetails")}</span>
           <h2>{item.word}</h2>
         </div>
         <Link className="btn btn-outline" to={backTo}>
-          Back to Vocabulary
+          {t("backToVocabulary")}
         </Link>
       </div>
 
       <div className="card detail-card">
         <p>
-          <strong>English Word:</strong> {item.word}
+          <strong>{t("englishWord")}</strong> {item.word}
         </p>
         <p>
-          <strong>Bengali Meaning:</strong> {item.meaning}
+          <strong>{t("bengaliMeaning")}</strong> {item.meaning}
         </p>
         <p>
-          <strong>Lesson Title:</strong> {item.lesson_title}
+          <strong>{t("lessonTitle")}</strong> {item.lesson_title}
         </p>
         {item.pronunciation ? (
           <p>
-            <strong>Pronunciation:</strong> {item.pronunciation}
+            <strong>{t("pronunciation")}</strong> {item.pronunciation}
+          </p>
+        ) : null}
+        {item.part_of_speech ? (
+          <p>
+            <strong>{t("partOfSpeech")}</strong> {t(item.part_of_speech)}
+          </p>
+        ) : null}
+        <p>
+          <strong>{t("difficulty")}</strong> {t(item.difficulty)}
+        </p>
+        {item.synonyms ? (
+          <p>
+            <strong>{t("synonyms")}</strong> {item.synonyms}
+          </p>
+        ) : null}
+        {item.antonyms ? (
+          <p>
+            <strong>{t("antonyms")}</strong> {item.antonyms}
           </p>
         ) : null}
         {item.example ? (
           <p>
-            <strong>Example Sentence:</strong> {item.example}
+            <strong>{t("exampleSentence")}</strong> {item.example}
           </p>
         ) : null}
       </div>

@@ -1,46 +1,42 @@
 import { Link } from "react-router-dom";
+import { useLanguage } from "../language";
 
 export default function AdminDashboard() {
+  const { t } = useLanguage();
+
   return (
     <section className="form-page">
       <div className="page-heading">
         <div>
-          <span className="eyebrow">Admin</span>
-          <h2>Content Management</h2>
-          <p className="muted-text">
-            Manage lesson and vocabulary records with Create, View, and Update
-            operations.
-          </p>
+          <span className="eyebrow">{t("admin")}</span>
+          <h2>{t("contentManagement")}</h2>
+          <p className="muted-text">{t("adminDashboardCopy")}</p>
         </div>
       </div>
 
       <div className="grid two-column-grid">
         <article className="card">
-          <h3>Lessons</h3>
-          <p className="muted-text">
-            Add new lessons, view the lesson list, and update lesson details.
-          </p>
+          <h3>{t("lessons")}</h3>
+          <p className="muted-text">{t("lessonAdminCopy")}</p>
           <div className="button-row">
             <Link className="btn btn-primary" to="/admin/lessons">
-              Manage Lessons
+              {t("manageLessons")}
             </Link>
             <Link className="btn btn-outline" to="/admin/lessons/new">
-              Add Lesson
+              {t("addLesson")}
             </Link>
           </div>
         </article>
 
         <article className="card">
-          <h3>Vocabulary</h3>
-          <p className="muted-text">
-            Add vocabulary, search all records, and update word information.
-          </p>
+          <h3>{t("vocabulary")}</h3>
+          <p className="muted-text">{t("vocabularyAdminCopy")}</p>
           <div className="button-row">
             <Link className="btn btn-primary" to="/admin/vocabulary">
-              Manage Vocabulary
+              {t("manageVocabulary")}
             </Link>
             <Link className="btn btn-outline" to="/admin/vocabulary/new">
-              Add Vocabulary
+              {t("addVocabulary")}
             </Link>
           </div>
         </article>

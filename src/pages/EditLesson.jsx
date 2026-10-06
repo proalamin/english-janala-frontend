@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
+import { useLanguage } from "../language";
 
 export default function EditLesson() {
+  const { t } = useLanguage();
   const { id } = useParams();
   const [form, setForm] = useState({ title: "", description: "" });
   const [errors, setErrors] = useState({});
@@ -70,24 +72,26 @@ export default function EditLesson() {
   }
 
   if (loading) {
-    return <p className="status-message">Loading lesson...</p>;
+    return <p className="status-message">{t("loadingLessons")}</p>;
   }
 
   return (
     <section className="form-page">
       <div className="page-heading">
         <div>
-          <span className="eyebrow">Admin</span>
-          <h2>Edit Lesson</h2>
+          <span className="eyebrow">{t("admin")}</span>
+          <h2>{t("editLesson")}</h2>
         </div>
         <Link className="btn btn-outline" to="/admin/lessons">
-          Back to Lessons
+          {t("backToLessons")}
         </Link>
       </div>
 
       <form className="card form-card" onSubmit={handleSubmit} noValidate>
         <label>
-          Title
+          <span className="label-text">
+            {t("title")} <span className="required-mark">*</span>
+          </span>
           <input
             name="title"
             value={form.title}
@@ -99,7 +103,9 @@ export default function EditLesson() {
         </label>
 
         <label>
-          Description
+          <span className="label-text">
+            {t("description")} <span className="optional-note">({t("optional")})</span>
+          </span>
           <textarea
             name="description"
             rows="4"
@@ -118,7 +124,7 @@ export default function EditLesson() {
 
         <div className="button-row">
           <button className="btn btn-primary" type="submit" disabled={saving}>
-            {saving ? "Updating..." : "Update Lesson"}
+            {saving ? t("updating") : t("updateLesson")}
           </button>
         </div>
       </form>

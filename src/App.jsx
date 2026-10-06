@@ -1,4 +1,5 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -12,6 +13,45 @@ import AddVocabulary from "./pages/AddVocabulary";
 import EditVocabulary from "./pages/EditVocabulary";
 import WordDetails from "./pages/WordDetails";
 import AdminDashboard from "./pages/AdminDashboard";
+import { useLanguage } from "./language";
+
+
+function RouteLoader() {
+  const location = useLocation();
+  const { t } = useLanguage();
+  const [visible, setVisible] = useState(false);
+  const [firstPath, setFirstPath] = useState(location.pathname);
+
+  useEffect(() => {
+    if (firstPath === location.pathname) {
+      setFirstPath(null);
+      return;
+    }
+
+    setVisible(true);
+    const timer = window.setTimeout(() => setVisible(false), 520);
+    return () => window.clearTimeout(timer);
+  }, [firstPath, location.pathname]);
+
+  if (!visible) {
+    return null;
+  }
+
+  return (
+    <div className="route-loader" role="status" aria-live="polite">
+      <div className="route-loader-card">
+        <div className="letter-loader" aria-hidden="true">
+          <span>E</span>
+          <span>J</span>
+          <span>অ</span>
+        </div>
+        <strong>{t("routeLoading")}</strong>
+        <p>{t("routeLoadingHint")}</p>
+        <div className="loader-progress" aria-hidden="true" />
+      </div>
+    </div>
+  );
+}
 
 function LegacyRedirect({ to }) {
   const params = window.location.pathname.split("/").filter(Boolean);
@@ -22,6 +62,7 @@ function LegacyRedirect({ to }) {
 export default function App() {
   return (
     <div className="app-shell">
+      <RouteLoader />
       <Navbar />
       <main className="page-container">
         <Routes>

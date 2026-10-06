@@ -1,8 +1,21 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
+import { useLanguage } from "../language";
+
+const PARTS_OF_SPEECH = [
+  "noun",
+  "verb",
+  "adjective",
+  "adverb",
+  "pronoun",
+  "preposition",
+  "conjunction",
+  "interjection",
+];
 
 export default function EditVocabulary() {
+  const { t } = useLanguage();
   const { id } = useParams();
   const [form, setForm] = useState({
     lesson: "",
@@ -10,6 +23,10 @@ export default function EditVocabulary() {
     meaning: "",
     pronunciation: "",
     example: "",
+    part_of_speech: "",
+    difficulty: "medium",
+    synonyms: "",
+    antonyms: "",
   });
   const [lessons, setLessons] = useState([]);
   const [errors, setErrors] = useState({});
@@ -32,6 +49,10 @@ export default function EditVocabulary() {
           meaning: vocabularyResponse.data.meaning || "",
           pronunciation: vocabularyResponse.data.pronunciation || "",
           example: vocabularyResponse.data.example || "",
+          part_of_speech: vocabularyResponse.data.part_of_speech || "",
+          difficulty: vocabularyResponse.data.difficulty || "medium",
+          synonyms: vocabularyResponse.data.synonyms || "",
+          antonyms: vocabularyResponse.data.antonyms || "",
         });
       } catch (requestError) {
         setMessage(getApiErrorMessage(requestError));
@@ -89,6 +110,10 @@ export default function EditVocabulary() {
         meaning: form.meaning.trim(),
         pronunciation: form.pronunciation.trim(),
         example: form.example.trim(),
+        part_of_speech: form.part_of_speech,
+        difficulty: form.difficulty,
+        synonyms: form.synonyms.trim(),
+        antonyms: form.antonyms.trim(),
       });
       setMessage("Vocabulary updated successfully.");
     } catch (requestError) {
@@ -99,26 +124,28 @@ export default function EditVocabulary() {
   }
 
   if (loading) {
-    return <p className="status-message">Loading vocabulary...</p>;
+    return <p className="status-message">{t("loadingVocabulary")}</p>;
   }
 
   return (
     <section className="form-page">
       <div className="page-heading">
         <div>
-          <span className="eyebrow">Admin</span>
-          <h2>Edit Vocabulary</h2>
+          <span className="eyebrow">{t("admin")}</span>
+          <h2>{t("updateVocabulary")}</h2>
         </div>
         <Link className="btn btn-outline" to="/admin/vocabulary">
-          Back to Vocabulary
+          {t("backToVocabulary")}
         </Link>
       </div>
 
       <form className="card form-card" onSubmit={handleSubmit} noValidate>
         <label>
-          Lesson
+          <span className="label-text">
+            {t("lesson")} <span className="required-mark">*</span>
+          </span>
           <select name="lesson" value={form.lesson} onChange={handleChange}>
-            <option value="">Select a lesson</option>
+            <option value="">{t("selectALesson")}</option>
             {lessons.map((lesson) => (
               <option key={lesson.id} value={lesson.id}>
                 {lesson.title}
@@ -131,7 +158,9 @@ export default function EditVocabulary() {
         </label>
 
         <label>
-          English Word
+          <span className="label-text">
+            {t("englishWordLabel")} <span className="required-mark">*</span>
+          </span>
           <input
             name="word"
             value={form.word}
@@ -143,7 +172,9 @@ export default function EditVocabulary() {
         </label>
 
         <label>
-          Bengali Meaning
+          <span className="label-text">
+            {t("bengaliMeaningLabel")} <span className="required-mark">*</span>
+          </span>
           <input
             name="meaning"
             value={form.meaning}
@@ -155,12 +186,53 @@ export default function EditVocabulary() {
         </label>
 
         <label>
-          Example Sentence (optional)
+          <span className="label-text">{t("exampleOptional")}</span>
           <textarea
             name="example"
             rows="4"
             value={form.example}
             onChange={handleChange}
+          />
+        </label>
+
+        <label>
+          <span className="label-text">{t("partOfSpeech")}</span>
+          <select name="part_of_speech" value={form.part_of_speech} onChange={handleChange}>
+            <option value="">{t("selectOptional")}</option>
+            {PARTS_OF_SPEECH.map((pos) => (
+              <option key={pos} value={pos}>
+                {t(pos)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          <span className="label-text">{t("difficulty")}</span>
+          <select name="difficulty" value={form.difficulty} onChange={handleChange}>
+            <option value="easy">{t("easy")}</option>
+            <option value="medium">{t("medium")}</option>
+            <option value="hard">{t("hard")}</option>
+          </select>
+        </label>
+
+        <label>
+          <span className="label-text">{t("synonymsOptional")}</span>
+          <input
+            name="synonyms"
+            value={form.synonyms}
+            onChange={handleChange}
+            placeholder={t("commaSeparatedPlaceholder")}
+          />
+        </label>
+
+        <label>
+          <span className="label-text">{t("antonymsOptional")}</span>
+          <input
+            name="antonyms"
+            value={form.antonyms}
+            onChange={handleChange}
+            placeholder={t("commaSeparatedPlaceholder")}
           />
         </label>
 
@@ -174,7 +246,7 @@ export default function EditVocabulary() {
 
         <div className="button-row">
           <button className="btn btn-primary" type="submit" disabled={saving}>
-            {saving ? "Updating..." : "Update Vocabulary"}
+            {saving ? t("updating") : t("updateVocabulary")}
           </button>
         </div>
       </form>

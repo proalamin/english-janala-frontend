@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import VocabularyCard from "../components/VocabularyCard";
 import { api, getApiErrorMessage } from "../api/axios";
+import { useLanguage } from "../language";
 
 export default function LessonVocabulary({ adminMode = false }) {
+  const { t } = useLanguage();
   const { id } = useParams();
   const [lesson, setLesson] = useState(null);
   const [vocabulary, setVocabulary] = useState([]);
@@ -51,21 +53,21 @@ export default function LessonVocabulary({ adminMode = false }) {
   }
 
   if (loading) {
-    return <p className="status-message">Loading lesson vocabulary...</p>;
+    return <p className="status-message">{t("loadingLessonVocabulary")}</p>;
   }
 
   return (
     <section>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">{adminMode ? "Admin" : "Lesson Vocabulary"}</span>
-          <h2>{lesson?.title || "Lesson"}</h2>
+          <span className="eyebrow">{adminMode ? t("admin") : t("lessonVocabulary")}</span>
+          <h2>{lesson?.title || t("lesson")}</h2>
           {lesson?.description ? (
             <p className="muted-text">{lesson.description}</p>
           ) : null}
         </div>
         <Link className="btn btn-outline" to={adminMode ? "/admin/lessons" : "/student/lessons"}>
-          Back to Lessons
+          {t("backToLessons")}
         </Link>
       </div>
 
@@ -74,8 +76,8 @@ export default function LessonVocabulary({ adminMode = false }) {
 
       {!error && vocabulary.length === 0 ? (
         <div className="empty-state card">
-          <h3>No vocabulary found</h3>
-          <p>This lesson does not contain any vocabulary yet.</p>
+          <h3>{t("noVocabularyFound")}</h3>
+          <p>{t("lessonNoVocabulary")}</p>
         </div>
       ) : null}
 

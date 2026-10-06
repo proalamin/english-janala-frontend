@@ -1,7 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useLanguage } from "../language";
 
 export default function LessonCard({ lesson, adminMode = false, onDelete }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const basePath = adminMode ? "/admin/lessons" : "/student/lessons";
   const detailPath = `${basePath}/${lesson.id}`;
 
@@ -35,15 +37,15 @@ export default function LessonCard({ lesson, adminMode = false, onDelete }) {
         <h3>{lesson.title}</h3>
       </div>
       <p className="muted-text">
-        {lesson.description || "No description added yet."}
+        {lesson.description || t("noDescription")}
       </p>
       <div className="button-row" onClick={handleActionClick}>
         <Link className="btn btn-secondary" to={detailPath}>
-          View Vocabulary
+          {t("viewVocabulary")}
         </Link>
         {adminMode ? (
           <Link className="btn btn-outline" to={`/admin/lessons/${lesson.id}/edit`}>
-            Edit
+            {t("edit")}
           </Link>
         ) : null}
         {adminMode ? (
@@ -52,7 +54,7 @@ export default function LessonCard({ lesson, adminMode = false, onDelete }) {
             type="button"
             onClick={handleDelete}
           >
-            Delete
+            {t("delete")}
           </button>
         ) : null}
       </div>

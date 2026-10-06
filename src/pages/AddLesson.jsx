@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
+import { useLanguage } from "../language";
 
 const initialForm = {
   title: "",
@@ -8,6 +9,7 @@ const initialForm = {
 };
 
 export default function AddLesson() {
+  const { t } = useLanguage();
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
@@ -59,17 +61,19 @@ export default function AddLesson() {
     <section className="form-page">
       <div className="page-heading">
         <div>
-          <span className="eyebrow">Admin</span>
-          <h2>Add Lesson</h2>
+          <span className="eyebrow">{t("admin")}</span>
+          <h2>{t("addLesson")}</h2>
         </div>
         <Link className="btn btn-outline" to="/admin/lessons">
-          Back to Lessons
+          {t("backToLessons")}
         </Link>
       </div>
 
       <form className="card form-card" onSubmit={handleSubmit} noValidate>
         <label>
-          Title
+          <span className="label-text">
+            {t("title")} <span className="required-mark">*</span>
+          </span>
           <input
             name="title"
             value={form.title}
@@ -81,7 +85,9 @@ export default function AddLesson() {
         </label>
 
         <label>
-          Description
+          <span className="label-text">
+            {t("description")} <span className="optional-note">({t("optional")})</span>
+          </span>
           <textarea
             name="description"
             rows="4"
@@ -100,7 +106,7 @@ export default function AddLesson() {
 
         <div className="button-row">
           <button className="btn btn-primary" type="submit" disabled={loading}>
-            {loading ? "Saving..." : "Save Lesson"}
+            {loading ? t("saving") : t("saveLesson")}
           </button>
         </div>
       </form>

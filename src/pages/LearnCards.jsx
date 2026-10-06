@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
+import { useLanguage } from "../language";
 
 export default function LearnCards() {
+  const { t } = useLanguage();
   const [lessons, setLessons] = useState([]);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [vocabulary, setVocabulary] = useState([]);
@@ -57,12 +59,12 @@ export default function LearnCards() {
     <section>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">Learn</span>
-          <h2>Learn Using Cards</h2>
-          <p className="muted-text">Choose a lesson, then practice each vocabulary word with a flip card.</p>
+          <span className="eyebrow">{t("practiceVocabulary")}</span>
+          <h2>{t("learnUsingCards")}</h2>
+          <p className="muted-text">{t("learnCardsCopy")}</p>
         </div>
         <Link className="btn btn-outline" to="/student/vocabulary">
-          Back to Vocabulary
+          {t("backToVocabulary")}
         </Link>
       </div>
 
@@ -71,11 +73,11 @@ export default function LearnCards() {
       <div className="learn-layout">
         <section className="learn-panel card">
           <div className="learn-panel-heading">
-            <span className="eyebrow">Step 1</span>
-            <h3>Select Lesson</h3>
+            <span className="eyebrow">{t("step1")}</span>
+            <h3>{t("selectLesson")}</h3>
           </div>
 
-          {loadingLessons ? <p className="status-message">Loading lessons...</p> : null}
+          {loadingLessons ? <p className="status-message">{t("loadingLessons")}</p> : null}
 
           <div className="learn-lesson-list">
             {lessons.map((lesson) => (
@@ -86,7 +88,7 @@ export default function LearnCards() {
                 onClick={() => openLesson(lesson)}
               >
                 <strong>{lesson.title}</strong>
-                <span>{lesson.description || "Practice this lesson."}</span>
+                <span>{lesson.description || t("practiceThisLesson")}</span>
               </button>
             ))}
           </div>
@@ -94,18 +96,18 @@ export default function LearnCards() {
 
         <section className="learn-panel card">
           <div className="learn-panel-heading">
-            <span className="eyebrow">Step 2</span>
-            <h3>{selectedLesson ? `${selectedLesson.title} Cards` : "Vocabulary Cards"}</h3>
+            <span className="eyebrow">{t("step2")}</span>
+            <h3>{selectedLesson ? `${selectedLesson.title} ${t("vocabularyCards")}` : t("vocabularyCards")}</h3>
           </div>
 
           {!selectedLesson ? (
-            <p className="muted-text">Select a lesson first to see vocabulary cards.</p>
+            <p className="muted-text">{t("selectLessonFirst")}</p>
           ) : null}
 
-          {loadingVocabulary ? <p className="status-message">Loading vocabulary...</p> : null}
+          {loadingVocabulary ? <p className="status-message">{t("loadingVocabulary")}</p> : null}
 
           {selectedLesson && !loadingVocabulary && vocabulary.length === 0 ? (
-            <p className="muted-text">No vocabulary is available for this lesson.</p>
+            <p className="muted-text">{t("noLessonCards")}</p>
           ) : null}
 
           <div className="learn-card-grid">
@@ -117,7 +119,7 @@ export default function LearnCards() {
                 onClick={() => openWord(item)}
               >
                 <strong>{item.word}</strong>
-                <span>Click to practice</span>
+                <span>{t("clickPractice")}</span>
               </button>
             ))}
           </div>
@@ -128,7 +130,7 @@ export default function LearnCards() {
         <div className="study-modal" role="dialog" aria-modal="true" aria-label={`${selectedWord.word} flash card`}>
           <div className="study-modal-backdrop" onClick={closeWord} />
           <div className="study-modal-content">
-            <button className="modal-close" type="button" onClick={closeWord} aria-label="Close card">
+            <button className="modal-close" type="button" onClick={closeWord} aria-label={t("closeCard")}>
               ×
             </button>
             <button
@@ -137,20 +139,20 @@ export default function LearnCards() {
               onClick={() => setFlipped((value) => !value)}
             >
               <span className="flip-card-face flip-card-front">
-                <span className="eyebrow">Vocabulary</span>
+                <span className="eyebrow">{t("vocabulary")}</span>
                 <strong>{selectedWord.word}</strong>
-                <small>Click card to flip</small>
+                <small>{t("clickFlip")}</small>
               </span>
               <span className="flip-card-face flip-card-back">
-                <span className="eyebrow">Details</span>
+                <span className="eyebrow">{t("details")}</span>
                 <strong>{selectedWord.meaning}</strong>
                 {selectedWord.pronunciation ? (
-                  <span><b>Pronunciation:</b> {selectedWord.pronunciation}</span>
+                  <span><b>{t("pronunciation")}</b> {selectedWord.pronunciation}</span>
                 ) : null}
                 {selectedWord.example ? (
-                  <span><b>Example:</b> {selectedWord.example}</span>
+                  <span><b>{t("exampleSentence")}</b> {selectedWord.example}</span>
                 ) : null}
-                <small>Click card to flip back</small>
+                <small>{t("clickFlipBack")}</small>
               </span>
             </button>
           </div>

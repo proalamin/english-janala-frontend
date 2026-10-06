@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import VocabularyCard from "../components/VocabularyCard";
 import { api, getApiErrorMessage } from "../api/axios";
+import { useLanguage } from "../language";
 
 export default function VocabularyList({ adminMode = false }) {
+  const { t } = useLanguage();
   const [vocabulary, setVocabulary] = useState([]);
   const [query, setQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
+  const [difficulty, setDifficulty] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -15,15 +18,16 @@ export default function VocabularyList({ adminMode = false }) {
     loadVocabulary();
   }, []);
 
-  async function loadVocabulary(searchQuery = "") {
+  async function loadVocabulary(searchQuery = "", difficultyFilter = difficulty) {
     try {
       setLoading(true);
       setError("");
       setMessage("");
       const nextQuery = searchQuery.trim();
+      const params = difficultyFilter ? `&difficulty=${difficultyFilter}` : "";
       const endpoint = nextQuery
-        ? `/vocabulary/search/?q=${encodeURIComponent(nextQuery)}`
-        : "/vocabulary/";
+        ? `/vocabulary/search/?q=${encodeURIComponent(nextQuery)}${params}`
+        : `/vocabulary/?${params.replace(/^&/, "")}`;
       const response = await api.get(endpoint);
       setVocabulary(nextQuery ? response.data.results || [] : response.data);
       setActiveQuery(nextQuery);
@@ -36,17 +40,24 @@ export default function VocabularyList({ adminMode = false }) {
 
   function handleSubmit(event) {
     event.preventDefault();
-    loadVocabulary(query);
+    loadVocabulary(query, difficulty);
   }
 
   function handleReset() {
     setQuery("");
-    loadVocabulary("");
+    setDifficulty("");
+    loadVocabulary("", "");
+  }
+
+  function handleDifficultyChange(event) {
+    const value = event.target.value;
+    setDifficulty(value);
+    loadVocabulary(query, value);
   }
 
   function searchSuggestion(value) {
     setQuery(value);
-    loadVocabulary(value);
+    loadVocabulary(value, difficulty);
   }
 
   async function deleteVocabulary(item) {
@@ -73,16 +84,16 @@ export default function VocabularyList({ adminMode = false }) {
     <section>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">{adminMode ? "Admin" : "Vocabulary"}</span>
-          <h2>{adminMode ? "Manage Vocabulary" : "Search Vocabulary"}</h2>
+          <span className="eyebrow">{adminMode ? t("admin") : t("learnVocabulary")}</span>
+          <h2>{adminMode ? t("manageVocabulary") : t("searchVocabularyHeading")}</h2>
         </div>
         {adminMode ? (
           <Link className="btn btn-primary" to="/admin/vocabulary/new">
-            Add Vocabulary
+            {t("addVocabulary")}
           </Link>
         ) : (
           <Link className="btn btn-primary" to="/student/learn-cards">
-            Learn Using Cards
+            {t("learnUsingCards")}
           </Link>
         )}
       </div>
@@ -90,39 +101,46 @@ export default function VocabularyList({ adminMode = false }) {
       <div className="search-panel card">
         <div className="search-panel-heading">
           <div>
-            <h3>{adminMode ? "Find a vocabulary record" : "Find a word"}</h3>
-            <p>
-              Search using an English word or Bengali meaning. Results update
-              from the vocabulary database.
-            </p>
+            <h3>{adminMode ? t("findVocabularyRecord") : t("findWord")}</h3>
+            <p>{t("searchPanelCopy")}</p>
           </div>
           {!loading && !error ? (
             <span className="result-count">
-              {activeQuery ? `${vocabulary.length} result(s)` : `${vocabulary.length} word(s)`}
+              {activeQuery ? `${vocabulary.length} ${t("resultCount")}` : `${vocabulary.length} ${t("wordCount")}`}
             </span>
           ) : null}
         </div>
 
         <form className="search-bar" onSubmit={handleSubmit}>
           <label className="search-field">
-            <span>Vocabulary search</span>
+            <span>{t("vocabularySearch")}</span>
             <input
               type="search"
-              placeholder="Example: Hello, মা, Rice"
+              placeholder={t("searchPlaceholder")}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
           </label>
           <button className="btn btn-primary" type="submit">
-            Search
+            {t("search")}
           </button>
           <button className="btn btn-outline" type="button" onClick={handleReset}>
-            Reset
+            {t("reset")}
           </button>
         </form>
 
-        <div className="search-suggestions" aria-label="Search suggestions">
-          <span>Try:</span>
+        <label className="search-field difficulty-filter">
+          <span>{t("difficulty")}</span>
+          <select value={difficulty} onChange={handleDifficultyChange}>
+            <option value="">{t("allDifficulties")}</option>
+            <option value="easy">{t("easy")}</option>
+            <option value="medium">{t("medium")}</option>
+            <option value="hard">{t("hard")}</option>
+          </select>
+        </label>
+
+        <div className="search-suggestions" aria-label={t("searchSuggestions")}>
+          <span>{t("try")}</span>
           {["Hello", "মা", "Rice"].map((item) => (
             <button type="button" key={item} onClick={() => searchSuggestion(item)}>
               {item}
@@ -131,23 +149,23 @@ export default function VocabularyList({ adminMode = false }) {
         </div>
       </div>
 
-      {loading ? <p className="status-message">Loading vocabulary...</p> : null}
+      {loading ? <p className="status-message">{t("loadingVocabulary")}</p> : null}
       {error ? <p className="status-message error">{error}</p> : null}
       {message ? <p className="status-message success">{message}</p> : null}
 
       {!loading && !error && vocabulary.length === 0 ? (
         <div className="empty-state card">
-          <h3>{activeQuery ? "No matching words found" : "No vocabulary found"}</h3>
+          <h3>{activeQuery ? t("noMatchingWords") : t("noVocabularyFound")}</h3>
           <p>
             {activeQuery
-              ? `No result matched "${activeQuery}". Try another English word or Bengali meaning.`
+              ? `${t("noResultMatched")} "${activeQuery}".`
               : adminMode
-                ? "Add vocabulary records to start building the database."
-                : "Vocabulary records are not available yet."}
+                ? t("addVocabularyPrompt")
+                : t("noVocabularyAvailable")}
           </p>
           {adminMode ? (
             <Link className="btn btn-primary" to="/admin/vocabulary/new">
-              Add Vocabulary
+              {t("addVocabulary")}
             </Link>
           ) : null}
         </div>

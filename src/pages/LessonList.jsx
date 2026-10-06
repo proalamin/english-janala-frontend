@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import LessonCard from "../components/LessonCard";
 import { api, getApiErrorMessage } from "../api/axios";
+import { useLanguage } from "../language";
 
 export default function LessonList({ adminMode = false }) {
+  const { t } = useLanguage();
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -48,27 +50,27 @@ export default function LessonList({ adminMode = false }) {
     <section>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">{adminMode ? "Admin" : "Lessons"}</span>
-          <h2>{adminMode ? "Manage Lessons" : "All Lessons"}</h2>
+          <span className="eyebrow">{adminMode ? t("admin") : t("lessons")}</span>
+          <h2>{adminMode ? t("manageLessons") : t("allLessons")}</h2>
         </div>
         {adminMode ? (
           <Link className="btn btn-primary" to="/admin/lessons/new">
-            Add Lesson
+            {t("addLesson")}
           </Link>
         ) : null}
       </div>
 
-      {loading ? <p className="status-message">Loading lessons...</p> : null}
+      {loading ? <p className="status-message">{t("loadingLessons")}</p> : null}
       {error ? <p className="status-message error">{error}</p> : null}
       {message ? <p className="status-message success">{message}</p> : null}
 
       {!loading && !error && lessons.length === 0 ? (
         <div className="empty-state card">
-          <h3>No lessons found</h3>
-          <p>{adminMode ? "Add your first lesson to start building the vocabulary database." : "No lessons are available yet."}</p>
+          <h3>{t("noLessonsFound")}</h3>
+          <p>{adminMode ? t("addFirstLesson") : t("noLessonsAvailable")}</p>
           {adminMode ? (
             <Link className="btn btn-primary" to="/admin/lessons/new">
-              Add Lesson
+              {t("addLesson")}
             </Link>
           ) : null}
         </div>

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
+import { useLanguage } from "../language";
 
 const navLinkClass = ({ isActive }) => `nav-link ${isActive ? "active" : ""}`;
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { language, toggleLanguage, t } = useLanguage();
 
   return (
     <header className="navbar">
@@ -13,14 +15,14 @@ export default function Navbar() {
           <span className="brand-mark">EJ</span>
           <span className="brand-text">
             <strong>English Janala</strong>
-            <small>Vocabulary learning app</small>
+            <small>{t("appSubtitle")}</small>
           </span>
         </Link>
 
         <button
           className="menu-button"
           onClick={() => setMenuOpen((value) => !value)}
-          aria-label="Toggle navigation menu"
+          aria-label={t("toggleNavigation")}
         >
           ☰
         </button>
@@ -31,29 +33,33 @@ export default function Navbar() {
             className={navLinkClass}
             onClick={() => setMenuOpen(false)}
           >
-            Home
+            {t("home")}
           </NavLink>
           <NavLink
             to="/student/lessons"
             className={navLinkClass}
             onClick={() => setMenuOpen(false)}
           >
-            Lessons
+            {t("lessons")}
           </NavLink>
           <NavLink
             to="/student/vocabulary"
             className={navLinkClass}
             onClick={() => setMenuOpen(false)}
           >
-            Learn Vocabulary
+            {t("learnVocabulary")}
           </NavLink>
           <NavLink
             to="/student/learn-cards"
             className={navLinkClass}
             onClick={() => setMenuOpen(false)}
           >
-            Practice Vocabulary
+            {t("practiceVocabulary")}
           </NavLink>
+          <button className="language-toggle" type="button" onClick={toggleLanguage}>
+            <span>{t("language")}</span>
+            <strong>{language === "en" ? "বাংলা" : "EN"}</strong>
+          </button>
         </nav>
       </div>
     </header>
