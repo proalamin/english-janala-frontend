@@ -67,6 +67,11 @@ export default function LessonVocabulary({ adminMode = false }) {
           ) : null}
         </div>
         <div className="button-row">
+          {!adminMode ? (
+            <Link className="btn btn-primary" to={`/student/bundles/${id}/practice`}>
+              {t("practiceVocabulary")}
+            </Link>
+          ) : null}
           {adminMode && lesson?.segment ? (
             <Link className="btn btn-primary" to={`/admin/vocabulary/new?segment=${lesson.segment}`}>
               {t("addVocabulary")}

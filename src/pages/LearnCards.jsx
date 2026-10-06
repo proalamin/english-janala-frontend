@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
 import { useLanguage } from "../language";
 import { getBundleProgress, isWordKnown, toggleWordKnown } from "../progress";
 
 export default function LearnCards() {
   const { t } = useLanguage();
+  const [searchParams] = useSearchParams();
   const [lessons, setLessons] = useState([]);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [vocabulary, setVocabulary] = useState([]);
@@ -33,6 +34,18 @@ export default function LearnCards() {
 
     fetchLessons();
   }, []);
+
+  useEffect(() => {
+    const bundleId = searchParams.get("bundle");
+    if (!bundleId || loadingLessons || selectedLesson) {
+      return;
+    }
+    const match = lessons.find((lesson) => String(lesson.id) === bundleId);
+    if (match) {
+      openLesson(match);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, loadingLessons, lessons]);
 
   async function openLesson(lesson) {
     try {

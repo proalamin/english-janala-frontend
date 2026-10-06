@@ -56,6 +56,13 @@ export default function Navbar() {
           >
             {t("practiceVocabulary")}
           </NavLink>
+          <NavLink
+            to="/student/segments"
+            className="nav-link nav-cta"
+            onClick={() => setMenuOpen(false)}
+          >
+            {t("startLearning")}
+          </NavLink>
           <button className="language-toggle" type="button" onClick={toggleLanguage}>
             <span>{t("language")}</span>
             <strong>{language === "en" ? "বাংলা" : "EN"}</strong>

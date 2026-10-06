@@ -11,6 +11,7 @@ import SegmentBundles from "./pages/SegmentBundles";
 import AddLesson from "./pages/AddLesson";
 import EditLesson from "./pages/EditLesson";
 import LessonVocabulary from "./pages/LessonVocabulary";
+import BundlePractice from "./pages/BundlePractice";
 import VocabularyList from "./pages/VocabularyList";
 import LearnCards from "./pages/LearnCards";
 import AddVocabulary from "./pages/AddVocabulary";
@@ -86,6 +87,7 @@ export default function App() {
           <Route path="/student/segments" element={<SegmentList />} />
           <Route path="/student/segments/:id" element={<SegmentBundles />} />
           <Route path="/student/bundles/:id" element={<LessonVocabulary />} />
+          <Route path="/student/bundles/:id/practice" element={<BundlePractice />} />
           <Route path="/student/vocabulary" element={<VocabularyList />} />
           <Route path="/student/learn-cards" element={<LearnCards />} />
           <Route path="/student/vocabulary/:id" element={<WordDetails backTo="/student/vocabulary" />} />

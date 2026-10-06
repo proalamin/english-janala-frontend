@@ -6,9 +6,10 @@ export default function LessonCard({ lesson, adminMode = false, onDelete, progre
   const { t } = useLanguage();
   const basePath = adminMode ? "/admin/bundles" : "/student/bundles";
   const detailPath = `${basePath}/${lesson.id}`;
+  const primaryPath = adminMode ? detailPath : `${detailPath}/practice`;
 
   function openLesson() {
-    navigate(detailPath);
+    navigate(primaryPath);
   }
 
   function handleActionClick(event) {
@@ -40,7 +41,7 @@ export default function LessonCard({ lesson, adminMode = false, onDelete, progre
           ) : null}
           {lesson.title}
         </h3>
-        {typeof lesson.vocabulary_count === "number" ? (
+        {adminMode && typeof lesson.vocabulary_count === "number" ? (
           <span className={`pill ${lesson.is_full ? "pill-full" : ""}`}>
             {lesson.vocabulary_count}/{lesson.capacity ?? 20} {t("words")}
           </span>
@@ -68,9 +69,14 @@ export default function LessonCard({ lesson, adminMode = false, onDelete, progre
         </div>
       ) : null}
       <div className="button-row" onClick={handleActionClick}>
-        <Link className="btn btn-secondary" to={detailPath}>
-          {t("viewVocabulary")}
+        <Link className={`btn ${adminMode ? "btn-secondary" : "btn-primary"}`} to={primaryPath}>
+          {adminMode ? t("viewVocabulary") : t("practiceVocabulary")}
         </Link>
+        {!adminMode ? (
+          <Link className="btn btn-outline" to={detailPath}>
+            {t("viewVocabulary")}
+          </Link>
+        ) : null}
         {adminMode ? (
           <Link className="btn btn-outline" to={`/admin/bundles/${lesson.id}/edit`}>
             {t("edit")}

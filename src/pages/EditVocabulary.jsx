@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
 import { useLanguage } from "../language";
+import WordMeaningListInput from "../components/WordMeaningListInput";
 
 const PARTS_OF_SPEECH = [
   "noun",
@@ -25,8 +26,8 @@ export default function EditVocabulary() {
     example: "",
     part_of_speech: "",
     difficulty: "medium",
-    synonyms: "",
-    antonyms: "",
+    synonyms: [],
+    antonyms: [],
   });
   const [lessons, setLessons] = useState([]);
   const [errors, setErrors] = useState({});
@@ -51,8 +52,8 @@ export default function EditVocabulary() {
           example: vocabularyResponse.data.example || "",
           part_of_speech: vocabularyResponse.data.part_of_speech || "",
           difficulty: vocabularyResponse.data.difficulty || "medium",
-          synonyms: vocabularyResponse.data.synonyms || "",
-          antonyms: vocabularyResponse.data.antonyms || "",
+          synonyms: vocabularyResponse.data.synonyms || [],
+          antonyms: vocabularyResponse.data.antonyms || [],
         });
       } catch (requestError) {
         setMessage(getApiErrorMessage(requestError));
@@ -112,8 +113,8 @@ export default function EditVocabulary() {
         example: form.example.trim(),
         part_of_speech: form.part_of_speech,
         difficulty: form.difficulty,
-        synonyms: form.synonyms.trim(),
-        antonyms: form.antonyms.trim(),
+        synonyms: form.synonyms,
+        antonyms: form.antonyms,
       });
       setMessage("Vocabulary updated successfully.");
     } catch (requestError) {
@@ -216,25 +217,17 @@ export default function EditVocabulary() {
           </select>
         </label>
 
-        <label>
-          <span className="label-text">{t("synonymsOptional")}</span>
-          <input
-            name="synonyms"
-            value={form.synonyms}
-            onChange={handleChange}
-            placeholder={t("commaSeparatedPlaceholder")}
-          />
-        </label>
+        <WordMeaningListInput
+          label={t("synonymsOptional")}
+          entries={form.synonyms}
+          onChange={(entries) => setForm((current) => ({ ...current, synonyms: entries }))}
+        />
 
-        <label>
-          <span className="label-text">{t("antonymsOptional")}</span>
-          <input
-            name="antonyms"
-            value={form.antonyms}
-            onChange={handleChange}
-            placeholder={t("commaSeparatedPlaceholder")}
-          />
-        </label>
+        <WordMeaningListInput
+          label={t("antonymsOptional")}
+          entries={form.antonyms}
+          onChange={(entries) => setForm((current) => ({ ...current, antonyms: entries }))}
+        />
 
         {message ? (
           <p

@@ -68,14 +68,26 @@ export default function WordDetails({ backTo = "/student/vocabulary" }) {
         <p>
           <strong>{t("difficulty")}</strong> {t(item.difficulty)}
         </p>
-        {item.synonyms ? (
+        {item.synonyms && item.synonyms.length > 0 ? (
           <p>
-            <strong>{t("synonyms")}</strong> {item.synonyms}
+            <strong>{t("synonyms")}</strong>{" "}
+            {item.synonyms.map((entry, index) => (
+              <span key={entry.word}>
+                {entry.word} {entry.meaning ? `(${entry.meaning})` : ""}
+                {index < item.synonyms.length - 1 ? ", " : ""}
+              </span>
+            ))}
           </p>
         ) : null}
-        {item.antonyms ? (
+        {item.antonyms && item.antonyms.length > 0 ? (
           <p>
-            <strong>{t("antonyms")}</strong> {item.antonyms}
+            <strong>{t("antonyms")}</strong>{" "}
+            {item.antonyms.map((entry, index) => (
+              <span key={entry.word}>
+                {entry.word} {entry.meaning ? `(${entry.meaning})` : ""}
+                {index < item.antonyms.length - 1 ? ", " : ""}
+              </span>
+            ))}
           </p>
         ) : null}
         {item.example ? (

@@ -227,6 +227,18 @@ textarea {
   background: rgba(31, 122, 63, 0.1);
 }
 
+.nav-cta {
+  background: var(--primary);
+  color: #ffffff !important;
+  font-weight: 800;
+}
+
+.nav-cta:hover,
+.nav-cta.active {
+  background: var(--primary-dark);
+  color: #ffffff !important;
+}
+
 .language-toggle {
   display: inline-flex;
   align-items: center;
@@ -535,6 +547,130 @@ textarea {
 
 .segment-complete-banner {
   margin-bottom: 16px;
+}
+
+.practice-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.practice-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px;
+  border-radius: 14px;
+  color: #ffffff;
+  box-shadow: var(--shadow);
+  min-height: 190px;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+a.practice-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 48px rgba(15, 74, 42, 0.2);
+}
+
+.practice-card-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.practice-card-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.practice-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.practice-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.practice-card-stat {
+  margin-top: auto;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.practice-card-sub {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.practice-card-track {
+  width: 100%;
+  height: 6px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  overflow: hidden;
+}
+
+.practice-card-fill {
+  height: 100%;
+  background: #ffffff;
+  border-radius: 999px;
+}
+
+.practice-card--flash {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+}
+
+.practice-card--match {
+  background: linear-gradient(135deg, #3b7fd6, #2458a8);
+}
+
+.practice-card--sentence {
+  background: linear-gradient(135deg, #2c9a8f, #1d6b63);
+}
+
+.practice-card--test {
+  background: linear-gradient(135deg, #c08a2e, #8f6420);
+}
+
+.practice-card--soon {
+  opacity: 0.88;
+  cursor: default;
+}
+
+.soon-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 980px) {
+  .practice-hub-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .practice-hub-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .bundle-serial {
@@ -987,6 +1123,33 @@ textarea {
 .form-card textarea {
   resize: vertical;
   min-height: 120px;
+}
+
+.word-meaning-list {
+  display: grid;
+  gap: 8px;
+}
+
+.word-meaning-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.word-meaning-remove {
+  padding: 10px 12px;
+  min-height: 42px;
+}
+
+.word-meaning-add {
+  width: fit-content;
+}
+
+@media (max-width: 560px) {
+  .word-meaning-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .search-panel {

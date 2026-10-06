@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
 import { useLanguage } from "../language";
+import WordMeaningListInput from "../components/WordMeaningListInput";
 
 const PARTS_OF_SPEECH = [
   "noun",
@@ -22,8 +23,8 @@ const initialForm = {
   example: "",
   part_of_speech: "",
   difficulty: "medium",
-  synonyms: "",
-  antonyms: "",
+  synonyms: [],
+  antonyms: [],
 };
 
 export default function AddVocabulary() {
@@ -98,8 +99,8 @@ export default function AddVocabulary() {
         example: form.example.trim(),
         part_of_speech: form.part_of_speech,
         difficulty: form.difficulty,
-        synonyms: form.synonyms.trim(),
-        antonyms: form.antonyms.trim(),
+        synonyms: form.synonyms,
+        antonyms: form.antonyms,
       });
       setMessage(
         `Vocabulary created successfully. Added to "${response.data.lesson_title}" (Bundle ${response.data.bundle_serial}).`,
@@ -202,25 +203,17 @@ export default function AddVocabulary() {
           </select>
         </label>
 
-        <label>
-          <span className="label-text">{t("synonymsOptional")}</span>
-          <input
-            name="synonyms"
-            value={form.synonyms}
-            onChange={handleChange}
-            placeholder={t("commaSeparatedPlaceholder")}
-          />
-        </label>
+        <WordMeaningListInput
+          label={t("synonymsOptional")}
+          entries={form.synonyms}
+          onChange={(entries) => setForm((current) => ({ ...current, synonyms: entries }))}
+        />
 
-        <label>
-          <span className="label-text">{t("antonymsOptional")}</span>
-          <input
-            name="antonyms"
-            value={form.antonyms}
-            onChange={handleChange}
-            placeholder={t("commaSeparatedPlaceholder")}
-          />
-        </label>
+        <WordMeaningListInput
+          label={t("antonymsOptional")}
+          entries={form.antonyms}
+          onChange={(entries) => setForm((current) => ({ ...current, antonyms: entries }))}
+        />
 
         {message ? (
           <p
