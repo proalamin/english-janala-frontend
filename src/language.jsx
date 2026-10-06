@@ -214,6 +214,11 @@ const translations = {
     meaningLabel: "Meaning (Bengali)",
     remove: "Remove",
     addRow: "+ Add",
+    tapToSeeMeaning: "Tap each word to see the meaning",
+    seeSynonymsAntonyms: "See Synonyms & Antonyms",
+    hide: "Hide",
+    noSynonymsAntonyms: "No synonyms or antonyms added for this word yet.",
+    backToBundle: "Back to Bundle",
   },
   bn: {
     appSubtitle: "শব্দভান্ডার শেখার অ্যাপ",
@@ -428,6 +433,11 @@ const translations = {
     meaningLabel: "অর্থ (বাংলা)",
     remove: "বাদ দিন",
     addRow: "+ যোগ করুন",
+    tapToSeeMeaning: "অর্থ দেখতে প্রতিটা শব্দে ট্যাপ করুন",
+    seeSynonymsAntonyms: "প্রতিশব্দ ও বিপরীত শব্দ দেখুন",
+    hide: "লুকান",
+    noSynonymsAntonyms: "এই শব্দের জন্য এখনো কোনো প্রতিশব্দ/বিপরীত শব্দ যোগ করা হয়নি।",
+    backToBundle: "বান্ডেলে ফিরে যান",
   },
 };
 

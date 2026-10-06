@@ -12,6 +12,7 @@ import AddLesson from "./pages/AddLesson";
 import EditLesson from "./pages/EditLesson";
 import LessonVocabulary from "./pages/LessonVocabulary";
 import BundlePractice from "./pages/BundlePractice";
+import FlashCards from "./pages/FlashCards";
 import VocabularyList from "./pages/VocabularyList";
 import LearnCards from "./pages/LearnCards";
 import AddVocabulary from "./pages/AddVocabulary";
@@ -113,6 +114,8 @@ export default function App() {
           <Route path="vocabulary/:id/edit" element={<EditVocabulary />} />
           <Route path="vocabulary/:id" element={<WordDetails backTo="/admin/vocabulary" />} />
         </Route>
+
+        <Route path="/student/bundles/:id/flashcards" element={<FlashCards />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

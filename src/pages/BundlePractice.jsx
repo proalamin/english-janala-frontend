@@ -92,8 +92,7 @@ export default function BundlePractice() {
       {error ? <p className="status-message error">{error}</p> : null}
 
       <div className="practice-hub-grid">
-        <div className="practice-card practice-card--flash practice-card--soon">
-          <span className="soon-badge">{t("comingSoon")}</span>
+        <Link to={`/student/bundles/${id}/flashcards`} className="practice-card practice-card--flash">
           <span className="practice-card-icon"><IconCards /></span>
           <h3>{t("flashCards")}</h3>
           <p>{t("flashCardsCopy")}</p>
@@ -106,7 +105,7 @@ export default function BundlePractice() {
               style={{ width: `${total ? Math.round((known / total) * 100) : 0}%` }}
             />
           </div>
-        </div>
+        </Link>
 
         <div className="practice-card practice-card--match practice-card--soon">
           <span className="soon-badge">{t("comingSoon")}</span>
