@@ -4,6 +4,8 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AdminLayout from "./components/AdminLayout";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import SegmentList from "./pages/SegmentList";
 import AddSegment from "./pages/AddSegment";
 import EditSegment from "./pages/EditSegment";
@@ -13,14 +15,17 @@ import EditLesson from "./pages/EditLesson";
 import LessonVocabulary from "./pages/LessonVocabulary";
 import BundlePractice from "./pages/BundlePractice";
 import FlashCards from "./pages/FlashCards";
+import MatchWords from "./pages/MatchWords";
 import VocabularyList from "./pages/VocabularyList";
-import LearnCards from "./pages/LearnCards";
 import AddVocabulary from "./pages/AddVocabulary";
 import EditVocabulary from "./pages/EditVocabulary";
 import WordDetails from "./pages/WordDetails";
 import AdminDashboard from "./pages/AdminDashboard";
+import StudentDashboard from "./pages/StudentDashboard";
 import AllBundles from "./pages/AllBundles";
+import NotFound from "./pages/NotFound";
 import { useLanguage } from "./language";
+import { AuthProvider, useAuth } from "./auth";
 
 
 function RouteLoader() {
@@ -78,28 +83,73 @@ function PublicLayout() {
   );
 }
 
-export default function App() {
+function RequireAdmin() {
+  const { user, loading, isAdmin } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return null;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/student/segments" replace />;
+  }
+
+  return <AdminLayout />;
+}
+
+function RequireAuth({ children }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return null;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  return children;
+}
+
+function AppRoutes() {
   return (
     <>
       <RouteLoader />
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/student/dashboard"
+            element={
+              <RequireAuth>
+                <StudentDashboard />
+              </RequireAuth>
+            }
+          />
           <Route path="/student/segments" element={<SegmentList />} />
           <Route path="/student/segments/:id" element={<SegmentBundles />} />
           <Route path="/student/bundles/:id" element={<LessonVocabulary />} />
           <Route path="/student/bundles/:id/practice" element={<BundlePractice />} />
-          <Route path="/student/vocabulary" element={<VocabularyList />} />
-          <Route path="/student/learn-cards" element={<LearnCards />} />
-          <Route path="/student/vocabulary/:id" element={<WordDetails backTo="/student/vocabulary" />} />
+          <Route path="/student/bundles/:id/match" element={<MatchWords />} />
+          <Route path="/student/vocabulary/:id" element={<WordDetails backTo="/student/segments" />} />
 
           <Route path="/lessons" element={<Navigate to="/student/segments" replace />} />
           <Route path="/lessons/:id" element={<LegacyRedirect to="/student/bundles" />} />
-          <Route path="/vocabulary" element={<Navigate to="/student/vocabulary" replace />} />
+          <Route path="/vocabulary" element={<Navigate to="/student/segments" replace />} />
           <Route path="/vocabulary/:id" element={<LegacyRedirect to="/student/vocabulary" />} />
+
+          <Route path="*" element={<NotFound />} />
         </Route>
 
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route path="/admin" element={<RequireAdmin />}>
           <Route index element={<AdminDashboard />} />
           <Route path="segments" element={<SegmentList adminMode />} />
           <Route path="segments/new" element={<AddSegment />} />
@@ -116,9 +166,15 @@ export default function App() {
         </Route>
 
         <Route path="/student/bundles/:id/flashcards" element={<FlashCards />} />
-
-        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import VocabularyCard from "../components/VocabularyCard";
+import LoginRequired from "../components/LoginRequired";
 import { api, getApiErrorMessage } from "../api/axios";
 import { useLanguage } from "../language";
 
@@ -11,19 +12,22 @@ export default function LessonVocabulary({ adminMode = false }) {
   const [vocabulary, setVocabulary] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [locked, setLocked] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [lessonResponse, vocabularyResponse] = await Promise.all([
-          api.get(`/lessons/${id}/`),
-          api.get(`/lessons/${id}/vocabulary/`),
-        ]);
+        const lessonResponse = await api.get(`/lessons/${id}/`);
         setLesson(lessonResponse.data);
+        const vocabularyResponse = await api.get(`/lessons/${id}/vocabulary/`);
         setVocabulary(vocabularyResponse.data);
       } catch (requestError) {
-        setError(getApiErrorMessage(requestError));
+        if (requestError.response?.status === 403) {
+          setLocked(true);
+        } else {
+          setError(getApiErrorMessage(requestError));
+        }
       } finally {
         setLoading(false);
       }
@@ -54,6 +58,10 @@ export default function LessonVocabulary({ adminMode = false }) {
 
   if (loading) {
     return <p className="status-message">{t("loadingLessonVocabulary")}</p>;
+  }
+
+  if (locked) {
+    return <LoginRequired />;
   }
 
   return (

@@ -3,11 +3,13 @@ import { Link, useParams } from "react-router-dom";
 import LessonCard from "../components/LessonCard";
 import { api, getApiErrorMessage } from "../api/axios";
 import { useLanguage } from "../language";
+import { useAuth } from "../auth";
 import { getBundleProgress } from "../progress";
 
 export default function SegmentBundles({ adminMode = false }) {
   const { t } = useLanguage();
   const { id } = useParams();
+  const { isAuthenticated } = useAuth();
   const [segment, setSegment] = useState(null);
   const [bundles, setBundles] = useState([]);
   const [progressByBundle, setProgressByBundle] = useState({});
@@ -28,18 +30,32 @@ export default function SegmentBundles({ adminMode = false }) {
         setBundles(bundlesResponse.data);
 
         if (!adminMode) {
-          const entries = await Promise.all(
-            bundlesResponse.data.map(async (bundle) => {
-              try {
-                const vocabResponse = await api.get(`/lessons/${bundle.id}/vocabulary/`);
-                const ids = vocabResponse.data.map((item) => item.id);
-                return [bundle.id, getBundleProgress(ids)];
-              } catch {
-                return [bundle.id, null];
-              }
-            }),
-          );
-          setProgressByBundle(Object.fromEntries(entries));
+          if (isAuthenticated) {
+            // The bundle list already carries known_count/progress_percent for the logged-in user.
+            const entries = bundlesResponse.data.map((bundle) => [
+              bundle.id,
+              {
+                known: bundle.known_count ?? 0,
+                total: bundle.vocabulary_count,
+                percent: bundle.progress_percent ?? 0,
+                complete: bundle.vocabulary_count > 0 && bundle.known_count === bundle.vocabulary_count,
+              },
+            ]);
+            setProgressByBundle(Object.fromEntries(entries));
+          } else {
+            const entries = await Promise.all(
+              bundlesResponse.data.map(async (bundle) => {
+                try {
+                  const vocabResponse = await api.get(`/lessons/${bundle.id}/vocabulary/`);
+                  const ids = vocabResponse.data.map((item) => item.id);
+                  return [bundle.id, getBundleProgress(ids)];
+                } catch {
+                  return [bundle.id, null];
+                }
+              }),
+            );
+            setProgressByBundle(Object.fromEntries(entries));
+          }
         }
       } catch (requestError) {
         setError(getApiErrorMessage(requestError));
@@ -49,7 +65,7 @@ export default function SegmentBundles({ adminMode = false }) {
     }
 
     fetchData();
-  }, [id, adminMode]);
+  }, [id, adminMode, isAuthenticated]);
 
   async function deleteBundle(bundle) {
     const confirmed = window.confirm(
@@ -83,6 +99,19 @@ export default function SegmentBundles({ adminMode = false }) {
           <span className="eyebrow">{adminMode ? t("admin") : t("segments")}</span>
           <h2>{segment ? segment.name : t("segments")}</h2>
           {segment?.description ? <p className="muted-text">{segment.description}</p> : null}
+          {!adminMode && isAuthenticated && segment?.progress_percent != null ? (
+            <div className="bundle-progress segment-progress-summary">
+              <div className="bundle-progress-track">
+                <div
+                  className={`bundle-progress-fill ${segment.progress_percent >= 100 ? "complete" : ""}`}
+                  style={{ width: `${segment.progress_percent}%` }}
+                />
+              </div>
+              <span className="bundle-progress-label">
+                {segment.known_count} {t("wordsLearned")} · {segment.progress_percent}%
+              </span>
+            </div>
+          ) : null}
         </div>
         <div className="button-row">
           {adminMode ? (

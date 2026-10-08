@@ -167,11 +167,7 @@ export default function VocabularyList({ adminMode = false }) {
           <Link className="btn btn-primary" to="/admin/vocabulary/new">
             {t("addVocabulary")}
           </Link>
-        ) : (
-          <Link className="btn btn-primary" to="/student/learn-cards">
-            {t("learnUsingCards")}
-          </Link>
-        )}
+        ) : null}
       </div>
 
       <div className="search-panel card">

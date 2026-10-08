@@ -40,6 +40,19 @@ export default function SegmentCard({ segment, adminMode = false, onDelete }) {
         </span>
       </div>
       <p className="muted-text">{segment.description || t("noDescription")}</p>
+      {!adminMode && segment.progress_percent != null ? (
+        <div className="bundle-progress">
+          <div className="bundle-progress-track">
+            <div
+              className={`bundle-progress-fill ${segment.progress_percent >= 100 ? "complete" : ""}`}
+              style={{ width: `${segment.progress_percent}%` }}
+            />
+          </div>
+          <span className="bundle-progress-label">
+            {segment.known_count}/{segment.total_words} {t("wordsLearned")}
+          </span>
+        </div>
+      ) : null}
       <div className="button-row" onClick={handleActionClick}>
         <Link className="btn btn-secondary" to={detailPath}>
           {t("viewBundles")}

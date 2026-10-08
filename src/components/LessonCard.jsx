@@ -1,15 +1,29 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "../language";
+import { useAuth } from "../auth";
 
 export default function LessonCard({ lesson, adminMode = false, onDelete, progress, showSegmentName = false }) {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const basePath = adminMode ? "/admin/bundles" : "/student/bundles";
   const detailPath = `${basePath}/${lesson.id}`;
   const primaryPath = adminMode ? detailPath : `${detailPath}/practice`;
+  const isLocked = !adminMode && !lesson.is_free && !isAuthenticated;
+  const targetPath = isLocked ? "/login" : primaryPath;
+  const secondaryTargetPath = isLocked ? "/login" : detailPath;
+
+  let primaryLabelKey = "startLearning";
+  if (progress) {
+    if (progress.complete) {
+      primaryLabelKey = "reviewBundle";
+    } else if (progress.known > 0) {
+      primaryLabelKey = "continueLearning";
+    }
+  }
 
   function openLesson() {
-    navigate(primaryPath);
+    navigate(targetPath);
   }
 
   function handleActionClick(event) {
@@ -46,6 +60,10 @@ export default function LessonCard({ lesson, adminMode = false, onDelete, progre
             {lesson.vocabulary_count}/{lesson.capacity ?? 20} {t("words")}
           </span>
         ) : null}
+        {!adminMode && lesson.is_free ? (
+          <span className="pill pill-free">{t("freePreview")}</span>
+        ) : null}
+        {isLocked ? <span className="pill pill-locked">🔒 {t("locked")}</span> : null}
       </div>
       {showSegmentName && lesson.segment_name ? (
         <span className="pill segment-pill">{lesson.segment_name}</span>
@@ -69,12 +87,12 @@ export default function LessonCard({ lesson, adminMode = false, onDelete, progre
         </div>
       ) : null}
       <div className="button-row" onClick={handleActionClick}>
-        <Link className={`btn ${adminMode ? "btn-secondary" : "btn-primary"}`} to={primaryPath}>
-          {adminMode ? t("viewVocabulary") : t("practiceVocabulary")}
+        <Link className={`btn ${adminMode ? "btn-secondary" : "btn-primary"}`} to={targetPath}>
+          {isLocked ? t("login") : adminMode ? t("viewVocabulary") : t(primaryLabelKey)}
         </Link>
         {!adminMode ? (
-          <Link className="btn btn-outline" to={detailPath}>
-            {t("viewVocabulary")}
+          <Link className="btn btn-outline" to={secondaryTargetPath}>
+            {isLocked ? t("login") : t("viewVocabulary")}
           </Link>
         ) : null}
         {adminMode ? (

@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
 import { useLanguage } from "../language";
 import { getKnownCount } from "../progress";
+import { useAuth } from "../auth";
+import LoginRequired from "../components/LoginRequired";
 
 function IconCards() {
   return (
@@ -43,24 +45,28 @@ function IconDoc() {
 export default function BundlePractice() {
   const { t } = useLanguage();
   const { id } = useParams();
+  const { isAuthenticated } = useAuth();
   const [bundle, setBundle] = useState(null);
   const [vocabulary, setVocabulary] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
         setError("");
-        const [bundleResponse, vocabularyResponse] = await Promise.all([
-          api.get(`/lessons/${id}/`),
-          api.get(`/lessons/${id}/vocabulary/`),
-        ]);
+        const bundleResponse = await api.get(`/lessons/${id}/`);
         setBundle(bundleResponse.data);
+        const vocabularyResponse = await api.get(`/lessons/${id}/vocabulary/`);
         setVocabulary(vocabularyResponse.data);
       } catch (requestError) {
-        setError(getApiErrorMessage(requestError));
+        if (requestError.response?.status === 403) {
+          setLocked(true);
+        } else {
+          setError(getApiErrorMessage(requestError));
+        }
       } finally {
         setLoading(false);
       }
@@ -70,10 +76,17 @@ export default function BundlePractice() {
   }, [id]);
 
   const total = vocabulary.length;
-  const known = getKnownCount(vocabulary.map((item) => item.id));
+  const known =
+    isAuthenticated && bundle?.known_count != null
+      ? bundle.known_count
+      : getKnownCount(vocabulary.map((item) => item.id));
 
   if (loading) {
     return <p className="status-message">{t("loadingBundles")}</p>;
+  }
+
+  if (locked) {
+    return <LoginRequired />;
   }
 
   return (
@@ -96,9 +109,17 @@ export default function BundlePractice() {
           <span className="practice-card-icon"><IconCards /></span>
           <h3>{t("flashCards")}</h3>
           <p>{t("flashCardsCopy")}</p>
+          <span className="practice-card-sub">{total} {t("words")}</span>
+        </Link>
+
+        <Link to={`/student/bundles/${id}/match`} className="practice-card practice-card--match">
+          <span className="practice-card-icon"><IconPuzzle /></span>
+          <h3>{t("matchWords")}</h3>
+          <p>{t("matchWordsCopy")}</p>
           <div className="practice-card-stat">
             <strong>{known}/{total}</strong>
           </div>
+          <span className="practice-card-sub">{Math.ceil(total / 4)} {t("rounds")}</span>
           <div className="practice-card-track">
             <div
               className="practice-card-fill"
@@ -106,20 +127,6 @@ export default function BundlePractice() {
             />
           </div>
         </Link>
-
-        <div className="practice-card practice-card--match practice-card--soon">
-          <span className="soon-badge">{t("comingSoon")}</span>
-          <span className="practice-card-icon"><IconPuzzle /></span>
-          <h3>{t("matchWords")}</h3>
-          <p>{t("matchWordsCopy")}</p>
-          <div className="practice-card-stat">
-            <strong>0/{total * 2}</strong>
-          </div>
-          <span className="practice-card-sub">{t("topScore")}: —</span>
-          <div className="practice-card-track">
-            <div className="practice-card-fill" style={{ width: "0%" }} />
-          </div>
-        </div>
 
         <div className="practice-card practice-card--sentence practice-card--soon">
           <span className="soon-badge">{t("comingSoon")}</span>

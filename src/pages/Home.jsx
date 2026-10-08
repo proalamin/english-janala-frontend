@@ -16,9 +16,6 @@ export default function Home() {
             <Link to="/student/segments" className="btn btn-primary">
               {t("startLearning")}
             </Link>
-            <Link to="/student/vocabulary" className="btn btn-secondary">
-              {t("searchVocabulary")}
-            </Link>
           </div>
         </div>
 
@@ -52,14 +49,6 @@ export default function Home() {
           </Link>
         </article>
 
-        <article className="card feature-card">
-          <span className="pill">{t("search")}</span>
-          <h3>{t("findWordsQuickly")}</h3>
-          <p>{t("searchFeatureCopy")}</p>
-          <Link className="text-link" to="/student/vocabulary">
-            {t("searchWords")}
-          </Link>
-        </article>
 
       </div>
     </section>

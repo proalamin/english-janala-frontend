@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
 import { useLanguage } from "../language";
 
-export default function WordDetails({ backTo = "/student/vocabulary" }) {
+export default function WordDetails({ backTo = "/student/segments" }) {
   const { t } = useLanguage();
   const { id } = useParams();
   const [item, setItem] = useState(null);

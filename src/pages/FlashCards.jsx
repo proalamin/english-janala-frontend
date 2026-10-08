@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, getApiErrorMessage } from "../api/axios";
 import { useLanguage } from "../language";
+import LoginRequired from "../components/LoginRequired";
 
 function IconBookmark() {
   return (
@@ -40,20 +41,23 @@ export default function FlashCards() {
   const [showExtra, setShowExtra] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
         setError("");
-        const [bundleResponse, vocabularyResponse] = await Promise.all([
-          api.get(`/lessons/${id}/`),
-          api.get(`/lessons/${id}/vocabulary/`),
-        ]);
+        const bundleResponse = await api.get(`/lessons/${id}/`);
         setBundle(bundleResponse.data);
+        const vocabularyResponse = await api.get(`/lessons/${id}/vocabulary/`);
         setVocabulary(vocabularyResponse.data);
       } catch (requestError) {
-        setError(getApiErrorMessage(requestError));
+        if (requestError.response?.status === 403) {
+          setLocked(true);
+        } else {
+          setError(getApiErrorMessage(requestError));
+        }
       } finally {
         setLoading(false);
       }
@@ -75,6 +79,10 @@ export default function FlashCards() {
 
   if (loading) {
     return <p className="status-message">{t("loadingVocabulary")}</p>;
+  }
+
+  if (locked) {
+    return <LoginRequired />;
   }
 
   if (error) {

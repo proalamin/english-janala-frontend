@@ -21,10 +21,8 @@ export default function Footer() {
         </div>
 
         <div className="footer-column">
-          <h3>{t("learnVocabulary")}</h3>
+          <h3>{t("segments")}</h3>
           <Link to="/student/segments">{t("browseLessons")}</Link>
-          <Link to="/student/vocabulary">{t("searchVocabulary")}</Link>
-          <Link to="/student/learn-cards">{t("practiceVocabulary")}</Link>
         </div>
 
         <div className="footer-column">
